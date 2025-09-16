@@ -23,6 +23,7 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarFooter,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
@@ -143,7 +144,15 @@ export default function MainLayout({
         </SidebarFooter>
       </Sidebar>
       <main className="flex-1 overflow-y-auto">
-        {children}
+        <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 md:hidden">
+            <Button variant="ghost" size="icon" className="shrink-0" asChild>
+              <Link href="/dashboard">
+                <Icons.logo className="size-6 text-primary" />
+              </Link>
+            </Button>
+           <SidebarTrigger className="ml-auto" />
+        </header>
+        <div className="md:pl-0">{children}</div>
       </main>
     </SidebarProvider>
   );
