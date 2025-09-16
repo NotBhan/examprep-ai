@@ -127,6 +127,7 @@ export default function DashboardPage() {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
+                  interval={0}
                 />
                 <YAxis
                   stroke="#888888"
