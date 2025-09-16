@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -14,6 +15,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  TooltipProps,
 } from 'recharts';
 import { useAppContext } from '@/hooks/use-app';
 import { useMemo } from 'react';
@@ -21,6 +23,35 @@ import type { SyllabusSubTopic, SyllabusTopic } from '@/lib/types';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, BookCopy, CalendarDays, FileQuestion, Bot, NotebookText } from 'lucide-react';
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
+
+const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="rounded-lg border bg-background p-2 shadow-sm">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col space-y-1">
+              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                Topic
+              </span>
+              <span className="font-bold text-foreground">{data.fullName}</span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                Weightage
+              </span>
+              <span className="font-bold text-muted-foreground">
+                {data.weightage}
+              </span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  
+    return null;
+};
 
 export default function DashboardPage() {
   const { mindMap, fileName } = useAppContext();
@@ -34,6 +65,7 @@ export default function DashboardPage() {
       .filter((topic): topic is SyllabusTopic => !!topic && !!topic.topic)
       .map((topic) => ({
         name: topic.topic.length > 15 ? `${topic.topic.substring(0, 12)}...` : topic.topic,
+        fullName: topic.topic,
         weightage: topic.weightage,
       }))
       .sort((a, b) => b.weightage - a.weightage);
@@ -105,10 +137,8 @@ export default function DashboardPage() {
                   domain={[0, 10]}
                 />
                 <Tooltip
-                    contentStyle={{
-                        backgroundColor: "hsl(var(--background))",
-                        borderColor: "hsl(var(--border))"
-                    }}
+                    cursor={{fill: "hsl(var(--accent))", opacity: 0.5}}
+                    content={<CustomTooltip />}
                 />
                 <Bar dataKey="weightage" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -175,3 +205,5 @@ function QuickLinkCard({href, icon: Icon, title, description} : {href: string, i
         </Card>
     )
 }
+
+    
