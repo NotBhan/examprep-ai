@@ -32,7 +32,9 @@ const TopicNode = ({ topic }: { topic: SyllabusTopic | SyllabusSubTopic }) => {
         <AccordionContent className="pl-6 border-l border-dashed ml-4">
           <Accordion type="multiple" className="w-full flex flex-col gap-1">
             <ul>
-                {topic.subtopics.map((sub, index) => (
+                {topic.subtopics
+                  .filter(sub => sub && (typeof sub === 'string' || sub.topic))
+                  .map((sub, index) => (
                     <TopicNode key={typeof sub === 'string' ? sub : sub.topic + index} topic={sub} />
                 ))}
             </ul>
