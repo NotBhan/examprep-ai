@@ -21,6 +21,7 @@ export type AskQuestionInput = z.infer<typeof AskQuestionInputSchema>;
 
 const AskQuestionOutputSchema = z.object({
   answer: z.string().describe('The answer to the question.'),
+  fromSyllabus: z.boolean().describe('Whether the answer was derived from the syllabus content.'),
 });
 export type AskQuestionOutput = z.infer<typeof AskQuestionOutputSchema>;
 
@@ -32,11 +33,13 @@ const prompt = ai.definePrompt({
   name: 'askQuestionPrompt',
   input: {schema: AskQuestionInputSchema},
   output: {schema: AskQuestionOutputSchema},
-  prompt: `You are an expert AI tutor. Your task is to answer questions about the provided syllabus content.
+  prompt: `You are an expert AI tutor. Your primary goal is to answer questions based on the provided syllabus content.
 
 When a question is a "what", "why", "when", "how" type of question, you must provide a concise answer of 4-5 sentences. Use bullet points where it helps to clarify the information.
 
-Always base your answers strictly on the following syllabus content.
+First, try to find the answer within the syllabus content provided below. If the answer is found, set the 'fromSyllabus' flag to true.
+
+If the answer cannot be found in the syllabus, use your general knowledge to provide an answer. In this case, set the 'fromSyllabus' flag to false and add a brief disclaimer at the end of your answer, such as: "Note: This information is based on general knowledge and may not be specific to your course syllabus."
 
 Syllabus Content:
 {{{syllabusContent}}}
@@ -44,8 +47,7 @@ Syllabus Content:
 ---
 
 Question: {{{question}}}
-
-Answer:`,
+`,
 });
 
 const askQuestionFlow = ai.defineFlow(

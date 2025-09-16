@@ -16,59 +16,18 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { askTutorAction } from '../actions';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea';
+import { Loader2, Info } from 'lucide-react';
 
-const TopicNode = ({ topic, onAsk }: { topic: SyllabusTopic | SyllabusSubTopic; onAsk: (question: string) => void }) => {
-  if (typeof topic === 'string') {
-    return (
-        <li className="py-2 pl-4 border-l border-dashed border-border ml-4">
-            <button onClick={() => onAsk(topic)} className="text-left hover:underline">{topic}</button>
-        </li>
-    );
-  }
-  
-  if (!topic || typeof topic !== 'object' || !topic.topic) {
-    return null;
-  }
-
-  const hasSubtopics = topic.subtopics && Array.isArray(topic.subtopics) && topic.subtopics.length > 0;
-
-  return (
-    <AccordionItem value={topic.topic} className="border-b-0">
-        <AccordionTrigger 
-            className="hover:no-underline rounded-md hover:bg-accent/50 px-2 text-left"
-            onClick={() => onAsk(topic.topic)}
-        >
-            <div className="flex items-center gap-4 w-full">
-                <div className="flex-1 text-left">
-                  <p className="font-semibold text-lg">{topic.topic}</p>
-                </div>
-                {topic.weightage !== undefined && <Badge variant="secondary" className="mt-1">Weightage: {topic.weightage}</Badge>}
-            </div>
-        </AccordionTrigger>
-        <AccordionContent className="pl-6 border-l border-dashed ml-4">
-            {hasSubtopics && (
-                <Accordion type="multiple" className="w-full flex flex-col gap-1">
-                <ul>
-                    {topic.subtopics
-                      .filter(sub => sub && (typeof sub === 'string' || (typeof sub === 'object' && sub.topic)))
-                      .map((sub, index) => (
-                        <TopicNode key={(typeof sub === 'string' ? sub : sub?.topic) + index} topic={sub} onAsk={onAsk} />
-                      ))}
-                </ul>
-                </Accordion>
-            )}
-        </AccordionContent>
-    </AccordionItem>
-  );
-};
+type Answer = {
+    text: string;
+    fromSyllabus: boolean;
+}
 
 export default function SyllabusPage() {
   const { mindMap, syllabusText } = useAppContext();
   const { toast } = useToast();
   
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const [loadingTopic, setLoadingTopic] = useState<string | null>(null);
 
   const handleToggle = async (topic: string) => {
@@ -90,77 +49,67 @@ export default function SyllabusPage() {
         });
 
         if (result.success && result.data?.answer) {
-            setAnswers(prev => ({ ...prev, [topic]: result.data.answer }));
+            setAnswers(prev => ({ ...prev, [topic]: { text: result.data.answer, fromSyllabus: result.data.fromSyllabus } }));
         } else {
             throw new Error(result.error || 'Failed to get an answer.');
         }
     } catch (error: any) {
         toast({ variant: 'destructive', title: 'Tutor Error', description: error.message });
-        setAnswers(prev => ({ ...prev, [topic]: "Sorry, I couldn't fetch an explanation for this topic." }));
+        setAnswers(prev => ({ ...prev, [topic]: { text: "Sorry, I couldn't fetch an explanation for this topic.", fromSyllabus: false } }));
     } finally {
         setLoadingTopic(null);
     }
   };
 
   const renderTopicNode = (topic: SyllabusTopic | SyllabusSubTopic) => {
-    if (typeof topic === 'string') {
-        const topicName = topic;
-        return (
-            <li className="ml-4 border-l border-dashed" key={topicName}>
-                <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value={topicName} className="border-b-0">
-                        <AccordionTrigger
-                            className="hover:no-underline rounded-md hover:bg-accent/50 px-2 text-left py-3"
-                            onClick={() => handleToggle(topicName)}
-                        >
-                           <p className="font-semibold">{topicName}</p>
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-2 pb-2 pr-2">
-                             {loadingTopic === topicName ? (
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                    <Loader2 className="h-4 w-4 animate-spin"/> Generating...
-                                </div>
-                            ) : (
-                                <p className="text-muted-foreground italic text-sm">{answers[topicName]}</p>
-                            )}
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
-            </li>
-        );
-    }
-
-    if (!topic || !topic.topic) return null;
-    const topicName = topic.topic;
-    const hasSubtopics = topic.subtopics && topic.subtopics.length > 0;
+    const topicName = typeof topic === 'string' ? topic : topic.topic;
+    if (!topicName) return null;
+    
+    const hasSubtopics = typeof topic === 'object' && topic.subtopics && topic.subtopics.length > 0;
 
     return (
-        <AccordionItem value={topicName} key={topicName} className="border rounded-lg mb-2 bg-card">
-            <AccordionTrigger 
-                className="hover:no-underline px-4 text-left"
-                onClick={() => handleToggle(topicName)}
-            >
-                <div className="flex items-center justify-between gap-4 w-full">
-                    <p className="font-semibold text-lg">{topicName}</p>
-                    {topic.weightage !== undefined && <Badge variant="secondary">Weightage: {topic.weightage}</Badge>}
-                </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 pt-2">
-                {loadingTopic === topicName ? (
-                    <div className="flex items-center gap-2 text-muted-foreground p-4">
-                        <Loader2 className="h-5 w-5 animate-spin"/> Thinking...
-                    </div>
-                ) : (
-                    <p className="text-muted-foreground italic mb-4">{answers[topicName]}</p>
-                )}
-                
-                {hasSubtopics && (
-                    <ul>
-                        {topic.subtopics.map((sub, index) => renderTopicNode(sub))}
-                    </ul>
-                )}
-            </AccordionContent>
-        </AccordionItem>
+        <li className={`ml-4 border-l border-dashed ${hasSubtopics ? '' : 'list-none'}`} key={topicName}>
+            <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value={topicName} className="border-b-0">
+                    <AccordionTrigger
+                        className="hover:no-underline rounded-md hover:bg-accent/50 px-2 text-left py-3 data-[state=open]:font-bold"
+                        onClick={() => handleToggle(topicName)}
+                        chevron={hasSubtopics}
+                    >
+                       <div className="flex items-center justify-between gap-4 w-full">
+                            <p className={`font-semibold ${hasSubtopics ? 'text-lg' : ''}`}>{topicName}</p>
+                            {typeof topic === 'object' && topic.weightage !== undefined && (
+                                <Badge variant="secondary" className="mr-2">Weightage: {topic.weightage}</Badge>
+                            )}
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2 pb-2 pr-2 pl-4">
+                         {loadingTopic === topicName ? (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <Loader2 className="h-4 w-4 animate-spin"/> Generating...
+                            </div>
+                        ) : (
+                            answers[topicName] && (
+                                <div>
+                                    <p className="text-muted-foreground italic text-sm">{answers[topicName].text}</p>
+                                    {!answers[topicName].fromSyllabus && (
+                                        <div className="mt-2 flex items-center gap-2 text-xs text-amber-500 bg-amber-500/10 p-2 rounded-md">
+                                            <Info className="h-4 w-4 shrink-0" />
+                                            <span>Answer based on general knowledge.</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        )}
+                        {hasSubtopics && (
+                           <ul>
+                                {topic.subtopics.map((sub, index) => renderTopicNode(sub))}
+                           </ul>
+                        )}
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        </li>
     );
   }
 
@@ -192,12 +141,12 @@ export default function SyllabusPage() {
                 <CardDescription>Click on any topic to expand it and get an instant AI-powered explanation.</CardDescription>
             </CardHeader>
             <CardContent className="p-4 md:p-6">
-                <Accordion type="multiple" className="w-full flex flex-col gap-2">
+                 <ul>
                     {mindMap.topics
                         .filter(topic => topic && typeof topic === 'object' && topic.topic)
-                        .map((topic) => renderTopicNode(topic))
+                        .map((topic, index) => renderTopicNode(topic))
                     }
-                </Accordion>
+                </ul>
             </CardContent>
        </Card>
     </div>
