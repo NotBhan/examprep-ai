@@ -74,7 +74,7 @@ You will receive the content of a syllabus file (like a PDF or TXT). Focus on ex
 Create a structured mind map object with the following properties:
 - \`topics\`: An array of main subjects.
 - \`topic\`: The name of a subject.
-- \`weightage\`: A numerical value from 1 (least important) to 10 (most important).
+- \`weightage\`: A numerical value from 0 (least important) to 10 (most important).
 - \`subtopics\`: An array of detailed areas within each topic, which can be nested.
 
 Ensure your output is a valid, well-structured object that conforms to the requested schema.

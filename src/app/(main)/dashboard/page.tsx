@@ -17,7 +17,7 @@ import {
 } from 'recharts';
 import { useAppContext } from '@/hooks/use-app';
 import { useMemo } from 'react';
-import type { SyllabusTopic } from '@/lib/types';
+import type { SyllabusSubTopic, SyllabusTopic } from '@/lib/types';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, BookCopy, CalendarDays, FileQuestion, Bot, NotebookText } from 'lucide-react';
@@ -102,6 +102,7 @@ export default function DashboardPage() {
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) => `${value}`}
+                  domain={[0, 10]}
                 />
                 <Tooltip
                     contentStyle={{

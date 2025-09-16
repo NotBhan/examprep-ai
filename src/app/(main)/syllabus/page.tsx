@@ -30,7 +30,7 @@ const TopicNode = ({ topic }: { topic: SyllabusTopic | SyllabusSubTopic }) => {
       <AccordionTrigger className="hover:no-underline rounded-md hover:bg-accent/50 px-2 text-left">
         <div className="flex items-center gap-4 w-full">
             <span className="font-semibold flex-1">{topic.topic}</span>
-            {topic.weightage && <Badge variant="secondary">Weightage: {topic.weightage}</Badge>}
+            {topic.weightage !== undefined && <Badge variant="secondary">Weightage: {topic.weightage}</Badge>}
         </div>
       </AccordionTrigger>
       {hasSubtopics && (
