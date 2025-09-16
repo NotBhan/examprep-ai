@@ -31,6 +31,7 @@ export default function DashboardPage() {
     }
 
     const data = mindMap.topics
+      .filter((topic): topic is SyllabusTopic => !!topic && !!topic.topic)
       .map((topic) => ({
         name: topic.topic.length > 15 ? `${topic.topic.substring(0, 12)}...` : topic.topic,
         weightage: topic.weightage,
@@ -48,7 +49,7 @@ export default function DashboardPage() {
     
     const total = countTopics(mindMap.topics);
 
-    const totalWeightage = mindMap.topics.reduce((sum, t) => sum + t.weightage, 0);
+    const totalWeightage = mindMap.topics.reduce((sum, t) => sum + (t?.weightage || 0), 0);
     const avg = mindMap.topics.length > 0 ? totalWeightage / mindMap.topics.length : 0;
 
     return { chartData: data, totalTopics: total, averageWeightage: parseFloat(avg.toFixed(1)) };
