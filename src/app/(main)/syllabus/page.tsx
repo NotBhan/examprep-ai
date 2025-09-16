@@ -41,7 +41,7 @@ const TopicNode = ({ topic, onAsk }: { topic: SyllabusTopic | SyllabusSubTopic; 
         <AccordionTrigger className="hover:no-underline rounded-md hover:bg-accent/50 px-2 text-left">
             <div className="flex items-start gap-4 w-full">
                 <div className="flex-1 text-left">
-                  <p className="font-semibold">{topic.topic}</p>
+                  <p className="font-semibold text-lg">{topic.topic}</p>
                   {topic.definition && (
                     <p className="text-xs text-muted-foreground mt-1">{topic.definition}</p>
                   )}
@@ -56,7 +56,7 @@ const TopicNode = ({ topic, onAsk }: { topic: SyllabusTopic | SyllabusSubTopic; 
                   .filter(sub => sub && (typeof sub === 'string' || (typeof sub === 'object' && sub.topic)))
                   .map((sub, index) => (
                     <TopicNode key={(typeof sub === 'string' ? sub : sub?.topic) + index} topic={sub} onAsk={onAsk} />
-                ))}
+                  ))}
             </ul>
             </Accordion>
         </AccordionContent>
@@ -172,7 +172,7 @@ export default function SyllabusPage() {
                         <Textarea
                             readOnly
                             value={tutorAnswer}
-                            className="w-full min-h-[200px] bg-muted/50 text-base"
+                            className="w-full min-h-[200px] bg-muted/50 text-base py-4"
                             rows={15}
                         />
                     )}
