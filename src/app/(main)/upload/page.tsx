@@ -1,3 +1,4 @@
+
 import { SyllabusUpload } from '@/components/syllabus-upload';
 import {
     Card,
@@ -10,7 +11,7 @@ import { CheckCircle } from 'lucide-react';
 
 export default function UploadPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background/50 p-4">
+    <main className="flex flex-1 flex-col items-center justify-center bg-background/50 p-4">
       <div className="container z-10 flex flex-col items-center justify-center gap-12 px-4 py-16 ">
         <div className="flex flex-col items-center gap-4 text-center">
           <h1 className="font-headline text-5xl font-bold tracking-tighter sm:text-6xl md:text-7xl">

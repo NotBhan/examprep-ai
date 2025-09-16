@@ -1,9 +1,10 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Construction } from "lucide-react";
 
 export default function QuizPage() {
     return (
-        <div className="flex-1 p-4 md:p-8 pt-6">
+        <div>
             <h2 className="text-3xl font-bold tracking-tight font-headline mb-4">
                 On-Demand Quiz Engine
             </h2>

@@ -23,7 +23,6 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarFooter,
-  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
@@ -31,6 +30,7 @@ import { useAppContext } from '@/hooks/use-app';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Header } from '@/components/header';
 
 
 const navItems = [
@@ -63,7 +63,7 @@ export default function MainLayout({
   }, [user, isSyllabusLoading, router, isClient]);
   
   useEffect(() => {
-    if (isClient && user && !isSyllabusLoading && !mindMap && pathname !== '/upload') {
+    if (isClient && user && !isSyllabusLoading && !mindMap && pathname !== '/upload' && pathname !== '/') {
       router.replace('/upload');
     }
   }, [user, mindMap, isSyllabusLoading, router, isClient, pathname]);
@@ -122,38 +122,31 @@ export default function MainLayout({
                     tooltip="Upload Syllabus"
                   >
                     <Upload />
-                    <span>Upload Syllabus</span>
+                    <span>{ mindMap ? "New Syllabus" : "Upload Syllabus" }</span>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-          <div className="flex items-center gap-3 p-2">
-            <Avatar>
-              <AvatarFallback>{user?.slice(0,2).toUpperCase()}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold truncate">{user}</span>
+            <div className="flex items-center gap-3 p-2">
+                <Avatar className="h-9 w-9">
+                    <AvatarFallback>{user?.slice(0, 2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                    <span className="text-sm font-semibold truncate">{user}</span>
+                </div>
             </div>
-          </div>
-          <Button variant="ghost" className="w-full justify-start gap-2" onClick={handleLogout}>
-            <LogOut className="h-4 w-4" />
-            <span>Logout</span>
-          </Button>
         </SidebarFooter>
       </Sidebar>
-      <main className="flex-1 overflow-y-auto">
-        <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 md:hidden">
-            <Button variant="ghost" size="icon" className="shrink-0" asChild>
-              <Link href="/dashboard">
-                <Icons.logo className="size-6 text-primary" />
-              </Link>
-            </Button>
-           <SidebarTrigger className="ml-auto" />
-        </header>
-        <div className="md:pl-0">{children}</div>
-      </main>
+      <div className="flex flex-col flex-1">
+        <Header />
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 md:p-6">
+            {children}
+          </div>
+        </main>
+      </div>
     </SidebarProvider>
   );
 }
