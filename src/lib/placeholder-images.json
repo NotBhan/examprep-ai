@@ -1,3 +1,11 @@
+
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-background",
+      "description": "A focused student studying at a modern desk with a laptop and books",
+      "imageUrl": "https://picsum.photos/seed/exam-prep/1920/1080",
+      "imageHint": "student studying"
+    }
+  ]
 }
