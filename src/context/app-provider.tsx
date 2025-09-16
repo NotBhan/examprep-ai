@@ -55,7 +55,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (storedActiveId && parsedSyllabuses.some(s => s.id === storedActiveId)) {
         setActiveSyllabusId(storedActiveId);
       } else if (parsedSyllabuses.length > 0) {
-        setActiveSyllabusId(parsedSyllabuses[0].id);
+        // Default to the most recently created one if active one is not found
+        const sorted = [...parsedSyllabuses].sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setActiveSyllabusId(sorted[0].id);
       } else {
         setActiveSyllabusId(null);
       }
@@ -152,12 +154,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const activeSyllabus = syllabuses.find(s => s.id === activeSyllabusId) || null;
 
-  // Temporary backward compatibility for older components
   const mindMap = activeSyllabus?.mindMap || null;
   const syllabusText = activeSyllabus?.syllabusText || null;
   const fileName = activeSyllabus?.name || null;
-  const setSyllabusData = addSyllabus;
-  const clearSyllabusData = () => { if(activeSyllabus) deleteSyllabus(activeSyllabus.id)};
   
   return (
     <AppContext.Provider value={{ 
@@ -173,8 +172,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       mindMap,
       syllabusText,
       fileName,
-      setSyllabusData, // for backward compatibility with upload component
-      clearSyllabusData, // for backward compatibility
       isSyllabusLoading, 
       setIsSyllabusLoading 
     }}>
