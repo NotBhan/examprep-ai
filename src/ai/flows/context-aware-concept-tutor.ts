@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI chatbot that answers syllabus-related questions, bounded by the uploaded syllabus content.
@@ -31,13 +32,20 @@ const prompt = ai.definePrompt({
   name: 'askQuestionPrompt',
   input: {schema: AskQuestionInputSchema},
   output: {schema: AskQuestionOutputSchema},
-  prompt: `You are an AI chatbot that answers questions about a syllabus.
+  prompt: `You are an expert AI tutor. Your task is to answer questions about the provided syllabus content.
 
-  Syllabus Content: {{{syllabusContent}}}
+When a question is a "what", "why", "when", "how" type of question, you must provide a concise answer of 4-5 sentences. Use bullet points where it helps to clarify the information.
 
-  Question: {{{question}}}
+Always base your answers strictly on the following syllabus content.
 
-  Answer:`,
+Syllabus Content:
+{{{syllabusContent}}}
+
+---
+
+Question: {{{question}}}
+
+Answer:`,
 });
 
 const askQuestionFlow = ai.defineFlow(
