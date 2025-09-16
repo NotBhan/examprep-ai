@@ -92,10 +92,17 @@ export function SyllabusUpload() {
       }
     } catch (error: any) {
       console.error(error);
+      let description = 'Could not process the syllabus. Please try again.';
+      if (error.message && error.message.includes('503 Service Unavailable')) {
+        description = 'The AI model is currently overloaded. Please try again in a few moments.';
+      } else if (error.message) {
+        description = error.message;
+      }
+      
       toast({
         variant: 'destructive',
         title: 'Upload Failed',
-        description: error.message || 'Could not process the syllabus. Please try again.',
+        description: description,
       });
       setIsSubmitting(false);
       setIsSyllabusLoading(false);
