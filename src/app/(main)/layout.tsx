@@ -90,8 +90,8 @@ export default function MainLayout({
   return (
     <SidebarProvider>
       <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-2">
+        <SidebarHeader className="p-2">
+          <div className="flex h-10 items-center gap-2">
             <Button variant="ghost" size="icon" className="shrink-0" asChild>
               <Link href="/dashboard">
                 <Icons.logo className="size-6 text-primary" />
