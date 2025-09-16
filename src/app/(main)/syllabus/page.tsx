@@ -38,8 +38,9 @@ const TopicNode = ({ topic }: { topic: SyllabusTopic | SyllabusSubTopic }) => {
           <Accordion type="multiple" className="w-full flex flex-col gap-1">
             <ul>
                 {topic.subtopics
+                  .filter(sub => sub && (typeof sub === 'string' || (typeof sub === 'object' && sub.topic)))
                   .map((sub, index) => (
-                    <TopicNode key={typeof sub === 'string' ? sub : (sub?.topic ?? 'sub') + index} topic={sub} />
+                    <TopicNode key={(typeof sub === 'string' ? sub : sub?.topic) + index} topic={sub} />
                 ))}
             </ul>
           </Accordion>
@@ -78,7 +79,7 @@ export default function SyllabusPage() {
         <CardContent className="p-4 md:p-6">
             <Accordion type="multiple" className="w-full flex flex-col gap-2">
                 {mindMap.topics
-                  .filter(topic => topic && topic.topic)
+                  .filter(topic => topic && typeof topic === 'object' && topic.topic)
                   .map((topic, index) => (
                     <TopicNode key={topic.topic + index} topic={topic} />
                 ))}
