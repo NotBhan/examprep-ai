@@ -10,6 +10,7 @@ import {
   Bot,
   LogOut,
   NotebookText,
+  Upload,
 } from 'lucide-react';
 
 import {
@@ -27,6 +28,8 @@ import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/hooks/use-app';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -43,7 +46,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { mindMap, isSyllabusLoading, clearSyllabusData } = useAppContext();
+  const { user, mindMap, isSyllabusLoading, logout } = useAppContext();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
@@ -52,17 +55,23 @@ export default function MainLayout({
   }, []);
 
   useEffect(() => {
-    if (isClient && !isSyllabusLoading && !mindMap) {
+    if (isClient && !isSyllabusLoading && !user) {
       router.replace('/');
     }
-  }, [mindMap, isSyllabusLoading, router, isClient]);
+  }, [user, isSyllabusLoading, router, isClient]);
+  
+  useEffect(() => {
+    if (isClient && user && !isSyllabusLoading && !mindMap && pathname !== '/upload') {
+      router.replace('/upload');
+    }
+  }, [user, mindMap, isSyllabusLoading, router, isClient, pathname]);
 
   const handleLogout = () => {
-    clearSyllabusData();
+    logout();
     router.push('/');
   };
 
-  if (!isClient || isSyllabusLoading || !mindMap) {
+  if (!isClient || isSyllabusLoading || !user) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
         <div className="flex items-center space-x-4">
@@ -91,7 +100,7 @@ export default function MainLayout({
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {navItems.map((item) => (
+            {mindMap && navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
                 <Link href={item.href}>
                   <SidebarMenuButton
@@ -104,12 +113,31 @@ export default function MainLayout({
                 </Link>
               </SidebarMenuItem>
             ))}
+             <SidebarMenuItem>
+                <Link href="/upload">
+                  <SidebarMenuButton
+                    isActive={pathname.startsWith('/upload')}
+                    tooltip="Upload Syllabus"
+                  >
+                    <Upload />
+                    <span>Upload Syllabus</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
+          <div className="flex items-center gap-3 p-2">
+            <Avatar>
+              <AvatarFallback>{user?.slice(0,2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold truncate">{user}</span>
+            </div>
+          </div>
           <Button variant="ghost" className="w-full justify-start gap-2" onClick={handleLogout}>
             <LogOut className="h-4 w-4" />
-            <span>New Syllabus</span>
+            <span>Logout</span>
           </Button>
         </SidebarFooter>
       </Sidebar>
