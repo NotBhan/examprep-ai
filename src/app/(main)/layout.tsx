@@ -23,6 +23,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarProvider,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Icons } from '@/components/icons';
 import { useAppContext } from '@/hooks/use-app';
@@ -46,7 +49,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, activeSyllabus, isSyllabusLoading } = useAppContext();
+  const { user, activeSyllabus, isSyllabusLoading, syllabuses, setActiveSyllabus } = useAppContext();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
@@ -66,6 +69,7 @@ export default function MainLayout({
     }
   }, [user, activeSyllabus, isSyllabusLoading, router, isClient, pathname]);
 
+  const sortedSyllabuses = [...syllabuses].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   if (!isClient || !user) {
     return <Loader />;
@@ -125,6 +129,29 @@ export default function MainLayout({
                 </Link>
               </SidebarMenuItem>
           </SidebarMenu>
+           {sortedSyllabuses.length > 0 && (
+            <>
+              <SidebarSeparator />
+              <SidebarGroup>
+                <SidebarGroupLabel>Recent</SidebarGroupLabel>
+                <SidebarMenu>
+                  {sortedSyllabuses.slice(0, 5).map((syllabus) => (
+                     <SidebarMenuItem key={syllabus.id}>
+                        <SidebarMenuButton
+                          isActive={syllabus.id === activeSyllabus?.id}
+                          onClick={() => setActiveSyllabus(syllabus.id)}
+                          tooltip={syllabus.name}
+                          size="sm"
+                          className="justify-start"
+                        >
+                            <span>{syllabus.name}</span>
+                        </SidebarMenuButton>
+                     </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroup>
+            </>
+          )}
         </SidebarContent>
       </Sidebar>
       <div className="flex flex-col flex-1">
