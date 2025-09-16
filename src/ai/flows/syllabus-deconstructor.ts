@@ -12,7 +12,8 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
+import type {SyllabusMindMap} from '@/lib/types';
 
 const DeconstructSyllabusInputSchema = z.object({
   syllabusDataUri: z
@@ -21,16 +22,44 @@ const DeconstructSyllabusInputSchema = z.object({
       'The syllabus file content as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'. Supported file types: PDF, TXT.'
     ),
 });
-export type DeconstructSyllabusInput = z.infer<typeof DeconstructSyllabusInputSchema>;
+export type DeconstructSyllabusInput = z.infer<
+  typeof DeconstructSyllabusInputSchema
+>;
+
+const SyllabusSubTopicSchema: z.ZodType<any> = z.lazy(() =>
+  z.union([
+    z.string(),
+    z.object({
+      topic: z.string(),
+      weightage: z.number().optional(),
+      subtopics: z.array(SyllabusSubTopicSchema).optional(),
+    }),
+  ])
+);
+
+const SyllabusTopicSchema = z.object({
+  topic: z.string(),
+  weightage: z.number(),
+  subtopics: z.array(SyllabusSubTopicSchema).optional(),
+});
+
+const SyllabusMindMapSchema = z.object({
+  topics: z.array(SyllabusTopicSchema),
+});
 
 const DeconstructSyllabusOutputSchema = z.object({
-  mindMapData: z
-    .string()
-    .describe('A JSON string representing the interactive syllabus mind map. Includes topics, subtopics, and estimated weightage for each topic.'),
+  mindMap: SyllabusMindMapSchema.describe(
+    'The interactive syllabus mind map with topics, subtopics, and weightage.'
+  ),
 });
-export type DeconstructSyllabusOutput = z.infer<typeof DeconstructSyllabusOutputSchema>;
 
-export async function deconstructSyllabus(input: DeconstructSyllabusInput): Promise<DeconstructSyllabusOutput> {
+export type DeconstructSyllabusOutput = z.infer<
+  typeof DeconstructSyllabusOutputSchema
+>;
+
+export async function deconstructSyllabus(
+  input: DeconstructSyllabusInput
+): Promise<DeconstructSyllabusOutput> {
   return deconstructSyllabusFlow(input);
 }
 
@@ -38,17 +67,17 @@ const deconstructSyllabusPrompt = ai.definePrompt({
   name: 'deconstructSyllabusPrompt',
   input: {schema: DeconstructSyllabusInputSchema},
   output: {schema: DeconstructSyllabusOutputSchema},
-  prompt: `You are an AI expert in exam syllabus analysis and mind map generation.
+  prompt: `You are an AI expert in exam syllabus analysis and mind map generation. Your task is to parse the provided syllabus content, identify the main topics and subtopics, and estimate the weightage of each topic based on its importance.
 
-You will receive the content of an exam syllabus as input. Your task is to parse the syllabus content, identify the main topics and subtopics, and estimate the weightage of each topic based on its importance in the syllabus.
+You will receive the content of a syllabus file (like a PDF or TXT). Focus on extracting the core textual information and ignore any formatting artifacts, page numbers, or irrelevant details.
 
-Create a JSON string representing an interactive syllabus mind map. The JSON should include:
+Create a structured mind map object with the following properties:
+- \`topics\`: An array of main subjects.
+- \`topic\`: The name of a subject.
+- \`weightage\`: A numerical value from 1 (least important) to 10 (most important).
+- \`subtopics\`: An array of detailed areas within each topic, which can be nested.
 
-- Topics: The main subjects covered in the syllabus.
-- Subtopics: The detailed areas within each topic.
-- Weightage: A numerical value (1-10) indicating the relative importance of the topic (1 being least important, 10 being most important).
-
-Ensure that the JSON is valid and well-structured for creating an interactive mind map.
+Ensure your output is a valid, well-structured object that conforms to the requested schema.
 
 Syllabus Content: {{media url=syllabusDataUri}}`,
 });
@@ -59,7 +88,7 @@ const deconstructSyllabusFlow = ai.defineFlow(
     inputSchema: DeconstructSyllabusInputSchema,
     outputSchema: DeconstructSyllabusOutputSchema,
   },
-  async input => {
+  async (input) => {
     const {output} = await deconstructSyllabusPrompt(input);
     return output!;
   }

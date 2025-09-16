@@ -71,10 +71,9 @@ export function SyllabusUpload() {
         const dataUri = reader.result as string;
         const result = await deconstructSyllabusAction(dataUri);
 
-        if (result.success && result.data) {
+        if (result.success && result.data?.mindMap) {
           try {
-            const parsedMindMap = JSON.parse(result.data.mindMapData);
-            setSyllabusData({ mindMap: parsedMindMap, syllabusText, fileName: file.name });
+            setSyllabusData({ mindMap: result.data.mindMap, syllabusText, fileName: file.name });
             toast({
               title: 'Success!',
               description: 'Your syllabus has been deconstructed.',
