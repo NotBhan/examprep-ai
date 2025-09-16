@@ -43,14 +43,16 @@ export default function DashboardPage() {
             if (typeof topic === 'string') {
                 return acc + 1;
             }
-            return acc + 1 + countTopics(topic.subtopics);
+            if (!topic || !topic.topic) return acc;
+            return acc + 1 + (topic.subtopics ? countTopics(topic.subtopics) : 0);
         }, 0);
     };
     
     const total = countTopics(mindMap.topics);
-
-    const totalWeightage = mindMap.topics.reduce((sum, t) => sum + (t?.weightage || 0), 0);
-    const avg = mindMap.topics.length > 0 ? totalWeightage / mindMap.topics.length : 0;
+    
+    const validTopics = mindMap.topics.filter((t): t is SyllabusTopic => !!t && t.weightage !== undefined);
+    const totalWeightage = validTopics.reduce((sum, t) => sum + t.weightage, 0);
+    const avg = validTopics.length > 0 ? totalWeightage / validTopics.length : 0;
 
     return { chartData: data, totalTopics: total, averageWeightage: parseFloat(avg.toFixed(1)) };
   }, [mindMap]);
