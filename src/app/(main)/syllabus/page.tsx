@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useAppContext } from '@/hooks/use-app';
@@ -17,8 +18,12 @@ const TopicNode = ({ topic }: { topic: SyllabusTopic | SyllabusSubTopic }) => {
   if (typeof topic === 'string') {
     return <li className="py-2 pl-4 border-l border-dashed border-border ml-4">{topic}</li>;
   }
+  
+  if (!topic || typeof topic !== 'object' || !topic.topic) {
+    return null;
+  }
 
-  const hasSubtopics = topic.subtopics && topic.subtopics.length > 0;
+  const hasSubtopics = topic.subtopics && Array.isArray(topic.subtopics) && topic.subtopics.length > 0;
 
   return (
     <AccordionItem value={topic.topic} className="border-b-0">
@@ -33,9 +38,8 @@ const TopicNode = ({ topic }: { topic: SyllabusTopic | SyllabusSubTopic }) => {
           <Accordion type="multiple" className="w-full flex flex-col gap-1">
             <ul>
                 {topic.subtopics
-                  .filter(sub => sub && (typeof sub === 'string' || sub.topic))
                   .map((sub, index) => (
-                    <TopicNode key={typeof sub === 'string' ? sub : sub.topic + index} topic={sub} />
+                    <TopicNode key={typeof sub === 'string' ? sub : sub?.topic + index} topic={sub} />
                 ))}
             </ul>
           </Accordion>
@@ -74,9 +78,8 @@ export default function SyllabusPage() {
         <CardContent className="p-4 md:p-6">
             <Accordion type="multiple" className="w-full flex flex-col gap-2">
                 {mindMap.topics
-                  .filter((topic): topic is SyllabusTopic => !!topic?.topic)
                   .map((topic, index) => (
-                    <TopicNode key={topic.topic + index} topic={topic} />
+                    <TopicNode key={topic?.topic + index} topic={topic} />
                 ))}
             </Accordion>
         </CardContent>
