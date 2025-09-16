@@ -71,7 +71,9 @@ export default function SyllabusPage() {
       <Card>
         <CardContent className="p-4 md:p-6">
             <Accordion type="multiple" className="w-full flex flex-col gap-2">
-                {mindMap.topics.map((topic, index) => (
+                {mindMap.topics
+                  .filter((topic): topic is SyllabusTopic => !!topic?.topic)
+                  .map((topic, index) => (
                     <TopicNode key={topic.topic + index} topic={topic} />
                 ))}
             </Accordion>
