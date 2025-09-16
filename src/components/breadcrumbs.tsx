@@ -14,6 +14,7 @@ const breadcrumbNameMap: { [key: string]: string } = {
   '/flashcards': 'Flashcards',
   '/tutor': 'Tutor',
   '/upload': 'Upload',
+  '/history': 'Syllabus History',
 };
 
 export function Breadcrumbs() {

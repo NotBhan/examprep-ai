@@ -49,7 +49,7 @@ export function SyllabusUpload() {
   const [fileName, setFileName] = useState('');
   const router = useRouter();
   const { toast } = useToast();
-  const { setSyllabusData, setIsSyllabusLoading } = useAppContext();
+  const { addSyllabus, setIsSyllabusLoading } = useAppContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -80,7 +80,7 @@ export function SyllabusUpload() {
           const result = await deconstructSyllabusAction(dataUri);
 
           if (result.success && result.data?.mindMap) {
-            setSyllabusData({ mindMap: result.data.mindMap, syllabusText, fileName: file.name });
+            addSyllabus({ mindMap: result.data.mindMap, syllabusText, fileName: file.name });
             toast({
               title: 'Success!',
               description: 'Your syllabus has been deconstructed.',

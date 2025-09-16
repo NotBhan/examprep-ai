@@ -12,6 +12,7 @@ import {
   LogOut,
   NotebookText,
   Upload,
+  History,
 } from 'lucide-react';
 
 import {
@@ -48,7 +49,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, mindMap, isSyllabusLoading, logout } = useAppContext();
+  const { user, activeSyllabus, isSyllabusLoading, logout } = useAppContext();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
@@ -63,10 +64,10 @@ export default function MainLayout({
   }, [user, isSyllabusLoading, router, isClient]);
   
   useEffect(() => {
-    if (isClient && user && !isSyllabusLoading && !mindMap && pathname !== '/upload' && pathname !== '/') {
+    if (isClient && user && !isSyllabusLoading && !activeSyllabus && pathname !== '/upload' && pathname !== '/' && pathname !== '/history') {
       router.replace('/upload');
     }
-  }, [user, mindMap, isSyllabusLoading, router, isClient, pathname]);
+  }, [user, activeSyllabus, isSyllabusLoading, router, isClient, pathname]);
 
   const handleLogout = () => {
     logout();
@@ -92,18 +93,19 @@ export default function MainLayout({
       <Sidebar>
         <SidebarHeader className="border-b h-16 flex items-center p-4">
             <Link href="/dashboard" className="flex items-center gap-2">
-                <Icons.logo className="size-6 text-primary" />
-                <h2 className="font-headline text-lg font-semibold truncate">ExamPrep AI</h2>
+                <Icons.logo className="size-8 text-primary" />
+                <h2 className="font-headline text-xl font-semibold truncate">ExamPrep AI</h2>
             </Link>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {mindMap && navItems.map((item) => (
+            {activeSyllabus && navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
                 <Link href={item.href}>
                   <SidebarMenuButton
                     isActive={pathname.startsWith(item.href)}
                     tooltip={item.label}
+                    size="lg"
                   >
                     <item.icon />
                     <span>{item.label}</span>
@@ -116,9 +118,22 @@ export default function MainLayout({
                   <SidebarMenuButton
                     isActive={pathname.startsWith('/upload')}
                     tooltip="Upload Syllabus"
+                    size="lg"
                   >
                     <Upload />
-                    <span>{ mindMap ? "New Syllabus" : "Upload Syllabus" }</span>
+                    <span>New Syllabus</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/history">
+                  <SidebarMenuButton
+                    isActive={pathname.startsWith('/history')}
+                    tooltip="Syllabus History"
+                    size="lg"
+                  >
+                    <History />
+                    <span>Syllabus History</span>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
