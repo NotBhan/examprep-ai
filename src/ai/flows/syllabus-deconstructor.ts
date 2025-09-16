@@ -31,6 +31,7 @@ const SyllabusSubTopicSchema: z.ZodType<any> = z.lazy(() =>
     z.string(),
     z.object({
       topic: z.string(),
+      definition: z.string().optional().describe('A concise one-line definition of the sub-topic.'),
       weightage: z.number().optional(),
       subtopics: z.array(SyllabusSubTopicSchema).optional(),
     }),
@@ -40,6 +41,7 @@ const SyllabusSubTopicSchema: z.ZodType<any> = z.lazy(() =>
 const SyllabusTopicSchema = z.object({
   topic: z.string(),
   weightage: z.number(),
+  definition: z.string().optional().describe('A concise one-line definition of the topic.'),
   subtopics: z.array(SyllabusSubTopicSchema).optional(),
 });
 
@@ -49,7 +51,7 @@ const SyllabusMindMapSchema = z.object({
 
 const DeconstructSyllabusOutputSchema = z.object({
   mindMap: SyllabusMindMapSchema.describe(
-    'The interactive syllabus mind map with topics, subtopics, and weightage.'
+    'The interactive syllabus mind map with topics, subtopics, definitions, and weightage.'
   ),
 });
 
@@ -67,14 +69,15 @@ const deconstructSyllabusPrompt = ai.definePrompt({
   name: 'deconstructSyllabusPrompt',
   input: {schema: DeconstructSyllabusInputSchema},
   output: {schema: DeconstructSyllabusOutputSchema},
-  prompt: `You are an AI expert in exam syllabus analysis and mind map generation. Your task is to parse the provided syllabus content, identify the main topics and subtopics, and estimate the weightage of each topic based on its importance.
+  prompt: `You are an AI expert in exam syllabus analysis and mind map generation. Your task is to parse the provided syllabus content, identify the main topics and subtopics, and estimate the weightage of each topic based on its importance. For each topic and sub-topic, you must also provide a concise, one-line definition.
 
 You will receive the content of a syllabus file (like a PDF or TXT). Focus on extracting the core textual information and ignore any formatting artifacts, page numbers, or irrelevant details.
 
 Create a structured mind map object with the following properties:
 - \`topics\`: An array of main subjects.
 - \`topic\`: The name of a subject.
-- \`weightage\`: A numerical value from 0 (least important) to 10 (most important).
+- \`definition\`: A concise, one-line definition of the topic or sub-topic.
+- \`weightage\`: A numerical value from 0 (least important) to 10 (most important). This should only be applied to main topics.
 - \`subtopics\`: An array of detailed areas within each topic, which can be nested.
 
 Ensure your output is a valid, well-structured object that conforms to the requested schema.

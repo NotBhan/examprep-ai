@@ -28,9 +28,14 @@ const TopicNode = ({ topic }: { topic: SyllabusTopic | SyllabusSubTopic }) => {
   return (
     <AccordionItem value={topic.topic} className="border-b-0">
       <AccordionTrigger className="hover:no-underline rounded-md hover:bg-accent/50 px-2 text-left">
-        <div className="flex items-center gap-4 w-full">
-            <span className="font-semibold flex-1">{topic.topic}</span>
-            {topic.weightage !== undefined && <Badge variant="secondary">Weightage: {topic.weightage}</Badge>}
+        <div className="flex items-start gap-4 w-full">
+            <div className="flex-1 text-left">
+              <p className="font-semibold">{topic.topic}</p>
+              {topic.definition && (
+                <p className="text-xs text-muted-foreground mt-1">{topic.definition}</p>
+              )}
+            </div>
+            {topic.weightage !== undefined && <Badge variant="secondary" className="mt-1">Weightage: {topic.weightage}</Badge>}
         </div>
       </AccordionTrigger>
       {hasSubtopics && (
