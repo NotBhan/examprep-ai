@@ -23,15 +23,12 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarProvider,
-  SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Icons } from '@/components/icons';
-import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/hooks/use-app';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Header } from '@/components/header';
+import { Loader } from '@/components/loader';
 
 
 const navItems = [
@@ -49,7 +46,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, activeSyllabus, isSyllabusLoading, logout } = useAppContext();
+  const { user, activeSyllabus, isSyllabusLoading } = useAppContext();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
@@ -69,23 +66,13 @@ export default function MainLayout({
     }
   }, [user, activeSyllabus, isSyllabusLoading, router, isClient, pathname]);
 
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
 
-  if (!isClient || isSyllabusLoading || !user) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center">
-        <div className="flex items-center space-x-4">
-          <Skeleton className="h-12 w-12 rounded-full" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px]" />
-            <Skeleton className="h-4 w-[200px]" />
-          </div>
-        </div>
-      </div>
-    );
+  if (!isClient || !user) {
+    return <Loader />;
+  }
+
+  if (isSyllabusLoading) {
+    return <Loader />
   }
 
   return (
@@ -139,16 +126,6 @@ export default function MainLayout({
               </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter>
-            <div className="flex items-center gap-3 p-2">
-                <Avatar className="h-9 w-9">
-                    <AvatarFallback>{user?.slice(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                    <span className="text-sm font-semibold truncate">{user}</span>
-                </div>
-            </div>
-        </SidebarFooter>
       </Sidebar>
       <div className="flex flex-col flex-1">
         <Header />
