@@ -40,10 +40,7 @@ const quizPrompt = ai.definePrompt({
   prompt: `You are an expert quiz generator. Generate a quiz on the topic of {{topic}} with {{numQuestions}} questions. The difficulty level should be {{difficulty}}. For each question, provide a list of options, the correct answer, and an AI-generated explanation for the correct answer. The explanation should clearly explain why the correct answer is correct and why the other options are incorrect.
 
 Ensure that the generated quiz adheres to the specified difficulty level and covers the key concepts of the topic.
-
-Output the quiz in JSON format:
-
-{{ generateQuizOutputSchema }}`, // fixed: using the correct schema name
+`,
 });
 
 const generateQuizFlow = ai.defineFlow(
