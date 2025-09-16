@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -69,42 +70,51 @@ export function SyllabusUpload() {
       reader.readAsDataURL(file);
       reader.onload = async () => {
         const dataUri = reader.result as string;
-        const result = await deconstructSyllabusAction(dataUri);
+        try {
+          const result = await deconstructSyllabusAction(dataUri);
 
-        if (result.success && result.data?.mindMap) {
-          try {
+          if (result.success && result.data?.mindMap) {
             setSyllabusData({ mindMap: result.data.mindMap, syllabusText, fileName: file.name });
             toast({
               title: 'Success!',
               description: 'Your syllabus has been deconstructed.',
             });
             router.push('/dashboard');
-          } catch (e) {
-             throw new Error("Failed to parse the syllabus structure. The AI may have returned an invalid format.");
-          }
-        } else {
+          } else {
             throw new Error(result.error || "An unknown error occurred during deconstruction.");
+          }
+        } catch (error: any) {
+            console.error(error);
+            let description = 'Could not process the syllabus. Please try again.';
+            if (error.message && error.message.includes('503 Service Unavailable')) {
+              description = 'The AI model is currently overloaded. Please try again in a few moments.';
+            } else if (error.message.includes('invalid format')) {
+              description = 'The AI returned an invalid format. Please try uploading the file again.';
+            } else if (error.message) {
+              description = error.message;
+            }
+            
+            toast({
+              variant: 'destructive',
+              title: 'Analysis Failed',
+              description: description,
+            });
+        } finally {
+            setIsSubmitting(false);
+            setIsSyllabusLoading(false);
         }
       };
       reader.onerror = () => {
         throw new Error("Failed to read the file.");
       }
     } catch (error: any) {
-      console.error(error);
-      let description = 'Could not process the syllabus. Please try again.';
-      if (error.message && error.message.includes('503 Service Unavailable')) {
-        description = 'The AI model is currently overloaded. Please try again in a few moments.';
-      } else if (error.message) {
-        description = error.message;
-      }
-      
-      toast({
-        variant: 'destructive',
-        title: 'Upload Failed',
-        description: description,
-      });
-      setIsSubmitting(false);
-    } finally {
+        console.error(error);
+        toast({
+            variant: 'destructive',
+            title: 'Upload Failed',
+            description: 'Could not read the file. Please ensure it is a valid PDF or TXT file and try again.',
+        });
+        setIsSubmitting(false);
         setIsSyllabusLoading(false);
     }
   };
