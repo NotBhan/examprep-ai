@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Select,
   SelectContent,
@@ -22,7 +22,6 @@ import { useAppContext } from '@/hooks/use-app';
 import { generateFlashcardsAction } from '../actions';
 import { useToast } from '@/hooks/use-toast';
 import type { SyllabusSubTopic, SyllabusTopic } from '@/lib/types';
-import { cn } from '@/lib/utils';
 
 type Flashcard = {
   question: string;
@@ -166,15 +165,33 @@ export default function FlashcardsPage() {
 
 function FlashcardItem({ card }: { card: Flashcard }) {
     const [isFlipped, setIsFlipped] = useState(false);
+
+    useEffect(() => {
+        const styleId = 'backface-visibility-style';
+        if (!document.getElementById(styleId)) {
+            const style = document.createElement('style');
+            style.id = styleId;
+            style.innerHTML = `
+              .backface-hidden {
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+              }
+              .preserve-3d {
+                transform-style: preserve-3d;
+              }
+              .rotate-y-180 {
+                transform: rotateY(180deg);
+              }
+            `;
+            document.head.appendChild(style);
+        }
+    }, [])
   
     return (
       <div className="p-1" style={{ perspective: '1000px' }}>
         <div 
-          className={cn(
-            "relative w-full h-80 rounded-lg shadow-lg transition-transform duration-700",
-            isFlipped ? '[transform:rotateY(180deg)]' : ''
-          )}
-          style={{ transformStyle: 'preserve-3d' }}
+          className="relative w-full h-80 rounded-lg shadow-lg transition-transform duration-700 preserve-3d"
+          style={{ transform: isFlipped ? 'rotateY(180deg)' : '' }}
           onClick={() => setIsFlipped(!isFlipped)}
         >
           {/* Front of the card */}
@@ -184,7 +201,7 @@ function FlashcardItem({ card }: { card: Flashcard }) {
           </div>
   
           {/* Back of the card */}
-          <div className="absolute w-full h-full backface-hidden bg-card border rounded-lg flex flex-col justify-center items-center p-6 text-center [transform:rotateY(180deg)]">
+          <div className="absolute w-full h-full backface-hidden bg-card border rounded-lg flex flex-col justify-center items-center p-6 text-center rotate-y-180">
              <p className="text-muted-foreground text-sm mb-2">Answer</p>
             <p className="text-lg md:text-xl">{card.answer}</p>
           </div>
@@ -197,18 +214,4 @@ function FlashcardItem({ card }: { card: Flashcard }) {
         </div>
       </div>
     );
-}
-
-// Utility to hide backface of card during flip
-const backfaceHidden = { backfaceVisibility: 'hidden', '-webkit-backface-visibility': 'hidden' };
-// Manually add the style to the head since it's not a standard tailwind utility
-if (typeof window !== 'undefined') {
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .backface-hidden {
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-      }
-    `;
-    document.head.appendChild(style);
 }
