@@ -90,15 +90,11 @@ export default function MainLayout({
   return (
     <SidebarProvider>
       <Sidebar>
-        <SidebarHeader className="p-2">
-          <div className="flex h-10 items-center gap-2">
-            <Button variant="ghost" size="icon" className="shrink-0" asChild>
-              <Link href="/dashboard">
+        <SidebarHeader className="border-b h-16 flex items-center p-4">
+            <Link href="/dashboard" className="flex items-center gap-2">
                 <Icons.logo className="size-6 text-primary" />
-              </Link>
-            </Button>
-            <h2 className="font-headline text-lg font-semibold truncate">ExamPrep AI</h2>
-          </div>
+                <h2 className="font-headline text-lg font-semibold truncate">ExamPrep AI</h2>
+            </Link>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
