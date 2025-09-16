@@ -105,7 +105,8 @@ export function SyllabusUpload() {
         description: description,
       });
       setIsSubmitting(false);
-      setIsSyllabusLoading(false);
+    } finally {
+        setIsSyllabusLoading(false);
     }
   };
   
