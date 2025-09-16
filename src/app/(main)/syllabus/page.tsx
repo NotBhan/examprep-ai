@@ -68,7 +68,7 @@ export default function SyllabusPage() {
     const hasSubtopics = typeof topic === 'object' && topic.subtopics && topic.subtopics.length > 0;
 
     return (
-        <li className={`ml-4 border-l border-solid ${hasSubtopics ? '' : 'list-none'}`} key={topicName}>
+        <li className={`ml-4 border-l border-solid ${hasSubtopics ? '' : 'list-none'} mb-2`} key={topicName}>
             <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value={topicName} className="border-b-0">
                     <AccordionTrigger
