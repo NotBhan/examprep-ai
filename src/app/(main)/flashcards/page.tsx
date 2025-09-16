@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -41,7 +42,7 @@ export default function FlashcardsPage() {
       topics.forEach((topic) => {
         if (typeof topic === 'string') {
           allTopics.push({ value: `${prefix}${topic}`, label: `${prefix}${topic}` });
-        } else {
+        } else if (topic && topic.topic) {
           const newPrefix = prefix ? `${prefix} > ${topic.topic}` : topic.topic;
           allTopics.push({ value: newPrefix, label: newPrefix });
           if (topic.subtopics) {
@@ -102,8 +103,8 @@ export default function FlashcardsPage() {
               <SelectValue placeholder="Select a topic..." />
             </SelectTrigger>
             <SelectContent>
-              {topics.map((topic) => (
-                <SelectItem key={topic.value} value={topic.value}>
+              {topics.map((topic, index) => (
+                <SelectItem key={`${topic.value}-${index}`} value={topic.value}>
                   {topic.label}
                 </SelectItem>
               ))}
