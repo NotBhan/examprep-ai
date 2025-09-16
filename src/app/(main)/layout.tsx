@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Bot,
   LogOut,
+  NotebookText,
 } from 'lucide-react';
 
 import {
@@ -32,6 +33,7 @@ const navItems = [
   { href: '/syllabus', icon: BookCopy, label: 'Syllabus' },
   { href: '/study-plan', icon: CalendarDays, label: 'Study Plan' },
   { href: '/quiz', icon: FileQuestion, label: 'Quiz' },
+  { href: '/flashcards', icon: NotebookText, label: 'Flashcards' },
   { href: '/tutor', icon: Bot, label: 'Tutor' },
 ];
 
@@ -88,7 +90,7 @@ export default function MainLayout({
               <SidebarMenuItem key={item.href}>
                 <Link href={item.href} legacyBehavior passHref>
                   <SidebarMenuButton
-                    isActive={pathname === item.href}
+                    isActive={pathname.startsWith(item.href)}
                     tooltip={item.label}
                   >
                     <item.icon />

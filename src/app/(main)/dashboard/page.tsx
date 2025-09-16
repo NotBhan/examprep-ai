@@ -20,7 +20,7 @@ import { useMemo } from 'react';
 import type { SyllabusTopic } from '@/lib/types';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BookCopy, CalendarDays, FileQuestion, Bot } from 'lucide-react';
+import { ArrowRight, BookCopy, CalendarDays, FileQuestion, Bot, NotebookText } from 'lucide-react';
 
 export default function DashboardPage() {
   const { mindMap, fileName } = useAppContext();
@@ -67,10 +67,11 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <QuickLinkCard href="/syllabus" icon={BookCopy} title="View Syllabus" description="Explore your syllabus mind map."/>
         <QuickLinkCard href="/study-plan" icon={CalendarDays} title="Create Plan" description="Generate your study schedule."/>
         <QuickLinkCard href="/quiz" icon={FileQuestion} title="Start Quiz" description="Test your knowledge."/>
+        <QuickLinkCard href="/flashcards" icon={NotebookText} title="Flashcards" description="Review key concepts."/>
         <QuickLinkCard href="/tutor" icon={Bot} title="Ask Tutor" description="Get help with concepts."/>
       </div>
 

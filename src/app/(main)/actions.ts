@@ -4,6 +4,7 @@ import { deconstructSyllabus } from '@/ai/flows/syllabus-deconstructor';
 import { generateStudyPlan } from '@/ai/flows/dynamic-study-planner';
 import { generateQuiz } from '@/ai/flows/on-demand-quiz-engine';
 import { askQuestion } from '@/ai/flows/context-aware-concept-tutor';
+import { generateFlashcards } from '@/ai/flows/flashcard-generator';
 
 export async function deconstructSyllabusAction(syllabusDataUri: string) {
   try {
@@ -13,6 +14,18 @@ export async function deconstructSyllabusAction(syllabusDataUri: string) {
     console.error('Error deconstructing syllabus:', error);
     return { success: false, error: error.message || 'Failed to deconstruct syllabus.' };
   }
+}
+
+export async function generateFlashcardsAction(
+    input: Parameters<typeof generateFlashcards>[0]
+) {
+    try {
+        const output = await generateFlashcards(input);
+        return { success: true, data: output };
+    } catch (error: any) {
+        console.error('Error generating flashcards:', error);
+        return { success: false, error: error.message || 'Failed to generate flashcards.' };
+    }
 }
 
 // Placeholder actions for other features
