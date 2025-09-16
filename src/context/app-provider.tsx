@@ -20,7 +20,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [syllabusText, setSyllabusText] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [isSyllabusLoading, setIsSyllabusLoading] = useState<boolean>(true);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     try {
@@ -28,53 +27,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const storedSyllabusText = localStorage.getItem('syllabusText');
       const storedFileName = localStorage.getItem('fileName');
       
-      if (storedMindMap) setMindMap(JSON.parse(storedMindMap));
-      if (storedSyllabusText) setSyllabusText(storedSyllabusText);
-      if (storedFileName) setFileName(storedFileName);
+      if (storedMindMap) {
+        setMindMap(JSON.parse(storedMindMap));
+      }
+      if (storedSyllabusText) {
+        setSyllabusText(storedSyllabusText);
+      }
+      if (storedFileName) {
+        setFileName(storedFileName);
+      }
     } catch (error) {
       console.error('Failed to parse syllabus data from localStorage', error);
       clearSyllabusData();
+    } finally {
+      setIsSyllabusLoading(false);
     }
-    setIsSyllabusLoading(false);
-    setIsInitialLoad(false);
   }, []);
 
-  useEffect(() => {
-    if (isInitialLoad) return;
-    try {
-      if (mindMap) {
-        localStorage.setItem('mindMap', JSON.stringify(mindMap));
-      } else {
-        localStorage.removeItem('mindMap');
-      }
-    } catch (error) {
-      console.error('Failed to save mind map to localStorage', error);
-    }
-  }, [mindMap, isInitialLoad]);
-
-  useEffect(() => {
-    if (isInitialLoad) return;
-    if (syllabusText) {
-      localStorage.setItem('syllabusText', syllabusText);
-    } else {
-      localStorage.removeItem('syllabusText');
-    }
-  }, [syllabusText, isInitialLoad]);
-  
-  useEffect(() => {
-    if (isInitialLoad) return;
-    if (fileName) {
-      localStorage.setItem('fileName', fileName);
-    } else {
-      localStorage.removeItem('fileName');
-    }
-  }, [fileName, isInitialLoad]);
-
-
   const setSyllabusData = ({ mindMap, syllabusText, fileName }: { mindMap: SyllabusMindMap; syllabusText: string; fileName: string }) => {
-    setMindMap(mindMap);
-    setSyllabusText(syllabusText);
-    setFileName(fileName);
+    try {
+        localStorage.setItem('mindMap', JSON.stringify(mindMap));
+        localStorage.setItem('syllabusText', syllabusText);
+        localStorage.setItem('fileName', fileName);
+        setMindMap(mindMap);
+        setSyllabusText(syllabusText);
+        setFileName(fileName);
+    } catch (error) {
+        console.error('Failed to save syllabus data to localStorage', error);
+    }
   };
 
   const clearSyllabusData = () => {
