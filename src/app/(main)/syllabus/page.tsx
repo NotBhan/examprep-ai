@@ -39,14 +39,11 @@ const TopicNode = ({ topic, onAsk }: { topic: SyllabusTopic | SyllabusSubTopic; 
     return (
         <AccordionItem value={topic.topic} className="border-b-0">
         <AccordionTrigger className="hover:no-underline rounded-md hover:bg-accent/50 px-2 text-left">
-            <div className="flex items-start gap-4 w-full">
+            <div className="flex items-center gap-4 w-full">
                 <div className="flex-1 text-left">
                   <p className="font-semibold text-lg">{topic.topic}</p>
-                  {topic.definition && (
-                    <p className="text-xs text-muted-foreground mt-1">{topic.definition}</p>
-                  )}
                 </div>
-                {topic.weightage !== undefined && <Badge variant="secondary" className="mt-1">Weightage: {topic.weightage}</Badge>}
+                {topic.weightage !== undefined && <Badge variant="secondary">Weightage: {topic.weightage}</Badge>}
             </div>
         </AccordionTrigger>
         <AccordionContent className="pl-6 border-l border-dashed ml-4">
@@ -68,9 +65,6 @@ const TopicNode = ({ topic, onAsk }: { topic: SyllabusTopic | SyllabusSubTopic; 
     <div className="flex items-center px-2 py-4">
         <div className="flex-1 text-left">
             <button onClick={() => onAsk(topic.topic)} className="font-semibold text-left hover:underline">{topic.topic}</button>
-            {topic.definition && (
-                <p className="text-xs text-muted-foreground mt-1">{topic.definition}</p>
-            )}
         </div>
         {topic.weightage !== undefined && <Badge variant="secondary">Weightage: {topic.weightage}</Badge>}
     </div>
@@ -182,3 +176,4 @@ export default function SyllabusPage() {
     </div>
   );
 }
+
