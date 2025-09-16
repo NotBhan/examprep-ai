@@ -25,7 +25,7 @@ import {
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/hooks/use-app';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const navItems = [
@@ -45,19 +45,24 @@ export default function MainLayout({
   const pathname = usePathname();
   const { mindMap, isSyllabusLoading, clearSyllabusData } = useAppContext();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (!isSyllabusLoading && !mindMap) {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient && !isSyllabusLoading && !mindMap) {
       router.replace('/');
     }
-  }, [mindMap, isSyllabusLoading, router]);
+  }, [mindMap, isSyllabusLoading, router, isClient]);
 
   const handleLogout = () => {
     clearSyllabusData();
     router.push('/');
   };
 
-  if (isSyllabusLoading || !mindMap) {
+  if (!isClient || isSyllabusLoading || !mindMap) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
         <div className="flex items-center space-x-4">
