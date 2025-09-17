@@ -13,6 +13,8 @@ import {
   NotebookText,
   Upload,
   History,
+  Edit,
+  Trash2,
 } from 'lucide-react';
 
 import {
@@ -26,6 +28,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarSeparator,
+  SidebarMenuAction,
 } from '@/components/ui/sidebar';
 import { Icons } from '@/components/icons';
 import { useAppContext } from '@/hooks/use-app';
@@ -33,6 +36,8 @@ import { useEffect, useState } from 'react';
 import { Header } from '@/components/header';
 import { Loader } from '@/components/loader';
 import { ErrorDialog } from '@/components/error-dialog';
+import { RenameSyllabusDialog } from '@/components/rename-syllabus-dialog';
+import { DeleteSyllabusDialog } from '@/components/delete-syllabus-dialog';
 
 
 const navItems = [
@@ -50,7 +55,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, activeSyllabus, isSyllabusLoading, syllabuses, setActiveSyllabus } = useAppContext();
+  const { user, activeSyllabus, isSyllabusLoading, syllabuses, setActiveSyllabus, showRenameDialog, showDeleteDialog } = useAppContext();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
@@ -147,6 +152,21 @@ export default function MainLayout({
                         >
                             <span>{syllabus.name}</span>
                         </SidebarMenuButton>
+                        <SidebarMenuAction
+                          onClick={() => showRenameDialog(syllabus.id, syllabus.name)}
+                          tooltip="Rename"
+                          showOnHover
+                        >
+                          <Edit />
+                        </SidebarMenuAction>
+                        <SidebarMenuAction
+                           onClick={() => showDeleteDialog(syllabus.id, syllabus.name)}
+                           tooltip="Delete"
+                           showOnHover
+                           className="right-8"
+                        >
+                            <Trash2 />
+                        </SidebarMenuAction>
                      </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
@@ -164,6 +184,8 @@ export default function MainLayout({
         </main>
       </div>
       <ErrorDialog />
+      <RenameSyllabusDialog />
+      <DeleteSyllabusDialog />
     </SidebarProvider>
   );
 }

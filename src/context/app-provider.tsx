@@ -19,6 +19,18 @@ interface ErrorDialogState {
   message: string;
 }
 
+interface RenameDialogState {
+  isOpen: boolean;
+  syllabusId: string | null;
+  currentName: string;
+}
+
+interface DeleteDialogState {
+    isOpen: boolean;
+    syllabusId: string | null;
+    syllabusName: string;
+}
+
 interface AppContextType {
   user: string | null;
   login: (username: string) => void;
@@ -42,6 +54,14 @@ interface AppContextType {
   errorDialog: ErrorDialogState;
   showErrorDialog: (title: string, message: string) => void;
   hideErrorDialog: () => void;
+  
+  renameDialog: RenameDialogState;
+  showRenameDialog: (id: string, name: string) => void;
+  hideRenameDialog: () => void;
+
+  deleteDialog: DeleteDialogState;
+  showDeleteDialog: (id: string, name: string) => void;
+  hideDeleteDialog: () => void;
 }
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -53,6 +73,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [activeSyllabusText, setActiveSyllabusText] = useState<string | null>(null);
   const [isSyllabusLoading, setIsSyllabusLoading] = useState<boolean>(true);
   const [errorDialog, setErrorDialog] = useState<ErrorDialogState>({ isOpen: false, title: '', message: '' });
+  const [renameDialog, setRenameDialog] = useState<RenameDialogState>({ isOpen: false, syllabusId: null, currentName: '' });
+  const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({ isOpen: false, syllabusId: null, syllabusName: '' });
   const router = useRouter();
 
   const loadUserData = useCallback((username: string) => {
@@ -207,6 +229,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const hideErrorDialog = () => {
     setErrorDialog({ isOpen: false, title: '', message: '' });
   };
+  
+  const showRenameDialog = (syllabusId: string, currentName: string) => {
+    setRenameDialog({ isOpen: true, syllabusId, currentName });
+  };
+
+  const hideRenameDialog = () => {
+    setRenameDialog({ isOpen: false, syllabusId: null, currentName: '' });
+  };
+  
+  const showDeleteDialog = (syllabusId: string, syllabusName: string) => {
+    setDeleteDialog({ isOpen: true, syllabusId, syllabusName });
+  };
+
+  const hideDeleteDialog = () => {
+    setDeleteDialog({ isOpen: false, syllabusId: null, syllabusName: '' });
+  };
 
   const activeSyllabus = syllabuses.find(s => s.id === activeSyllabusId) || null;
 
@@ -232,7 +270,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setIsSyllabusLoading,
       errorDialog,
       showErrorDialog,
-      hideErrorDialog
+      hideErrorDialog,
+      renameDialog,
+      showRenameDialog,
+      hideRenameDialog,
+      deleteDialog,
+      showDeleteDialog,
+      hideDeleteDialog
     }}>
       {children}
     </AppContext.Provider>
