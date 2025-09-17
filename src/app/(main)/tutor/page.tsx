@@ -16,6 +16,13 @@ type Message = {
     content: string;
 };
 
+const examplePrompts = [
+    'Explain the most important topic.',
+    'Summarize the first main topic for me.',
+    'Compare and contrast the first two main topics.',
+    'What is the estimated weightage of each main topic?',
+];
+
 export default function TutorPage() {
     const { syllabusText } = useAppContext();
     const { toast } = useToast();
@@ -23,6 +30,7 @@ export default function TutorPage() {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         if (scrollAreaRef.current) {
@@ -67,6 +75,10 @@ export default function TutorPage() {
         }
     };
     
+    const handlePromptClick = (prompt: string) => {
+        setInput(prompt);
+        inputRef.current?.focus();
+    }
 
     return (
         <div className="flex flex-col h-[calc(100vh-8rem)]">
@@ -89,11 +101,22 @@ export default function TutorPage() {
                 <CardContent className="flex-1 p-0 flex flex-col">
                     <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
                         <div className="space-y-6 pr-4">
-                        {messages.length === 0 ? (
-                             <div className="text-center text-muted-foreground pt-10">
+                        {messages.length === 0 && !isLoading ? (
+                            <div className="text-center text-muted-foreground pt-10">
                                 <Lightbulb className="mx-auto h-10 w-10 mb-4 text-primary" />
                                 <p className="font-semibold">Welcome to your AI Tutor!</p>
-                                <p>Ask a question like "Explain the key concepts of Topic A" to get started.</p>
+                                <p className="mb-6">Click a prompt or type your own question below to get started.</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
+                                    {examplePrompts.map((prompt, i) => (
+                                        <button 
+                                            key={i} 
+                                            onClick={() => handlePromptClick(prompt)}
+                                            className="p-3 border rounded-md text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                                        >
+                                            {prompt}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         ) : (
                              messages.map((message, index) => (
@@ -129,6 +152,7 @@ export default function TutorPage() {
                     <div className="p-4 border-t">
                         <div className="relative">
                             <Textarea
+                                ref={inputRef}
                                 placeholder="Ask Marika a question about your syllabus..."
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
