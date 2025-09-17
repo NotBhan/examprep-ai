@@ -3,15 +3,23 @@
 
 import { useEffect, useState } from 'react';
 import { Icons } from '@/components/icons';
-import { Progress } from '@/components/ui/progress';
+import { Loader2 } from 'lucide-react';
+
+const analysisPhases = [
+    "Parsing document...",
+    "Identifying main topics...",
+    "Structuring sub-topics...",
+    "Estimating importance...",
+    "Building mind map...",
+];
 
 export function Loader() {
-  const [progress, setProgress] = useState(10);
+  const [currentPhase, setCurrentPhase] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setProgress((prev) => (prev >= 90 ? 10 : prev + 10));
-    }, 600);
+        setCurrentPhase((prev) => (prev + 1) % analysisPhases.length);
+    }, 1500);
     return () => {
       clearInterval(timer);
     };
@@ -23,8 +31,10 @@ export function Loader() {
             <Icons.logo className="size-10 text-primary" />
             <h2 className="font-headline text-3xl font-semibold">ExamPrep AI</h2>
         </div>
-        <p className="text-muted-foreground">Analyzing your syllabus...</p>
-        <Progress value={progress} className="w-1/3" />
+        <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin"/>
+            <p className="transition-all duration-300">{analysisPhases[currentPhase]}</p>
+        </div>
     </div>
   );
 }
