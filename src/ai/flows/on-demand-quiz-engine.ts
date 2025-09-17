@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Generates quizzes on selected topics with customizable difficulty and number of questions, and provides AI-generated explanations for each answer.
@@ -11,9 +12,10 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateQuizInputSchema = z.object({
-  topic: z.string().describe('The topic for the quiz.'),
+  topic: z.string().describe('The topic for the quiz. If the topic is "Complete Syllabus", questions should cover the entire syllabus content.'),
+  syllabusContent: z.string().describe('The full content of the syllabus for context.'),
   difficulty: z.enum(['easy', 'medium', 'hard']).describe('The difficulty level of the quiz.'),
-  numQuestions: z.number().int().min(1).max(20).describe('The number of questions in the quiz.'),
+  numQuestions: z.number().int().min(1).max(15).describe('The number of questions in the quiz.'),
 });
 export type GenerateQuizInput = z.infer<typeof GenerateQuizInputSchema>;
 
@@ -37,9 +39,23 @@ const quizPrompt = ai.definePrompt({
   name: 'quizPrompt',
   input: {schema: GenerateQuizInputSchema},
   output: {schema: GenerateQuizOutputSchema},
-  prompt: `You are an expert quiz generator. Generate a quiz on the topic of {{topic}} with {{numQuestions}} questions. The difficulty level should be {{difficulty}}. For each question, provide a list of options, the correct answer, and an AI-generated explanation for the correct answer. The explanation should clearly explain why the correct answer is correct and why the other options are incorrect.
+  prompt: `You are an expert quiz generator. Your task is to generate a quiz based on the provided syllabus content.
 
-Ensure that the generated quiz adheres to the specified difficulty level and covers the key concepts of the topic.
+Topic: {{topic}}
+Difficulty: {{difficulty}}
+Number of Questions: {{numQuestions}}
+
+Syllabus Content for Context:
+{{{syllabusContent}}}
+
+Instructions:
+1.  Generate a quiz with {{numQuestions}} questions.
+2.  If the topic is "Complete Syllabus", the questions should cover a broad range of topics from the entire syllabus.
+3.  If a specific topic is provided, focus the questions on that topic.
+4.  For each question, provide a list of multiple-choice options, identify the correct answer, and write a clear explanation for why the correct answer is right and the others are wrong.
+5.  Ensure the quiz difficulty matches the "{{difficulty}}" level.
+
+Adhere strictly to the provided syllabus content for generating all questions, answers, and explanations.
 `,
 });
 
@@ -54,3 +70,4 @@ const generateQuizFlow = ai.defineFlow(
     return output!;
   }
 );
+

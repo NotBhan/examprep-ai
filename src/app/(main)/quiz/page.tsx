@@ -54,7 +54,7 @@ const quizFormSchema = z.object({
 });
 
 export default function QuizPage() {
-  const { mindMap } = useAppContext();
+  const { mindMap, syllabusText } = useAppContext();
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +64,7 @@ export default function QuizPage() {
   const [quizState, setQuizState] = useState<'configuring' | 'taking' | 'results'>('configuring');
 
   const topics = useMemo(() => {
-    const allTopics: { value: string; label: string }[] = [];
+    const allTopics: { value: string; label: string }[] = [{ value: 'Complete Syllabus', label: 'Complete Syllabus' }];
     const extractTopics = (topics: (SyllabusTopic | SyllabusSubTopic)[], prefix = '') => {
       topics.forEach((topic) => {
         if (typeof topic === 'string') {
@@ -94,10 +94,14 @@ export default function QuizPage() {
   });
 
   const handleGenerateQuiz = async (values: z.infer<typeof quizFormSchema>) => {
+    if (!syllabusText) {
+        toast({ variant: 'destructive', title: 'Error', description: 'No syllabus content found.' });
+        return;
+    }
     setIsLoading(true);
     setQuizData(null);
     try {
-      const result = await generateQuizAction(values);
+      const result = await generateQuizAction({ ...values, syllabusContent: syllabusText });
       if (result.success && result.data) {
         setQuizData(result.data.quiz);
         setUserAnswers(new Array(result.data.quiz.length).fill(''));
@@ -233,7 +237,7 @@ export default function QuizPage() {
                                          <FormControl>
                                             <Slider
                                                 min={1}
-                                                max={10}
+                                                max={15}
                                                 step={1}
                                                 value={[field.value]}
                                                 onValueChange={(vals) => field.onChange(vals[0])}
@@ -341,5 +345,3 @@ export default function QuizPage() {
     </div>
   );
 }
-
-    

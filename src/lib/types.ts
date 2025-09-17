@@ -1,3 +1,4 @@
+
 export type SyllabusSubTopic = string | {
   topic: string;
   definition?: string;
@@ -19,6 +20,7 @@ export type SyllabusMindMap = {
 // From on-demand-quiz-engine.ts
 export type GenerateQuizInput = {
   topic: string;
+  syllabusContent: string;
   difficulty: "easy" | "medium" | "hard";
   numQuestions: number;
 };
