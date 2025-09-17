@@ -81,6 +81,8 @@ export function SyllabusUpload() {
             });
             router.push('/dashboard');
           } else {
+            // This was previously throwing an error and crashing the app.
+            // Now we let the catch block handle it.
             throw new Error(result.error || "An unknown error occurred during deconstruction.");
           }
         } catch (error: any) {
@@ -88,7 +90,7 @@ export function SyllabusUpload() {
             let description = 'Could not process the syllabus. Please try again.';
             if (error.message && error.message.includes('503 Service Unavailable')) {
               description = 'The AI model is currently overloaded. Please try again in a few moments.';
-            } else if (error.message.includes('invalid format')) {
+            } else if (error.message && error.message.includes('invalid format')) {
               description = 'The AI returned an invalid format. Please try uploading the file again.';
             } else if (error.message) {
               description = error.message;
