@@ -113,7 +113,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setSyllabuses(syllabusesToPersist);
       } catch (error) {
         console.error("Failed to save syllabuses to localStorage", error);
-        // Potentially notify the user that the data couldn't be saved
+        throw error;
       }
     }
   };
@@ -156,7 +156,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       console.error("Failed to save new syllabus, storage might be full.", error);
       // Clean up the text if the syllabus list fails to update
       localStorage.removeItem(`${user}_syllabus_text_${newSyllabus.id}`);
-      throw new Error("Could not save syllabus. Your browser storage is full.");
+      throw error;
     }
   };
 

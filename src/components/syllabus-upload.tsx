@@ -90,6 +90,8 @@ export function SyllabusUpload() {
               description = 'The AI model is currently overloaded. Please try again in a few moments.';
             } else if (error.message && error.message.includes('invalid format')) {
               description = 'The AI returned an invalid format. Please try uploading the file again.';
+            } else if (error.message.includes('quota')) {
+                description = 'Your browser storage is full. Please remove some syllabuses to add new ones.'
             } else if (error.message) {
               description = error.message;
             }
