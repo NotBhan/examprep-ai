@@ -20,7 +20,7 @@ export function ErrorDialog() {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{errorDialog.title}</AlertDialogTitle>
-          <AlertDialogDescription className="break-words">
+          <AlertDialogDescription>
             {errorDialog.message}
           </AlertDialogDescription>
         </AlertDialogHeader>
