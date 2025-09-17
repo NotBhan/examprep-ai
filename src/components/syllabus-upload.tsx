@@ -22,25 +22,19 @@ import { deconstructSyllabusAction } from '@/app/(main)/actions';
 import { useAppContext } from '@/hooks/use-app';
 import { Card, CardContent } from '@/components/ui/card';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 const ACCEPTED_FILE_TYPES = [
   'application/pdf',
   'text/plain',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-  'application/msword', // .doc
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
-  'application/vnd.ms-powerpoint', // .ppt
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-  'application/vnd.ms-excel', // .xls
 ];
 
 const formSchema = z.object({
   file: z
     .instanceof(File)
-    .refine((file) => file.size <= MAX_FILE_SIZE, `File size should be less than 10 MB.`)
+    .refine((file) => file.size <= MAX_FILE_SIZE, `File size should be less than 25 MB.`)
     .refine(
       (file) => ACCEPTED_FILE_TYPES.includes(file.type),
-      'Only PDF, TXT, and MS Office files are accepted.'
+      'Only PDF and TXT files are accepted.'
     ),
 });
 
@@ -138,7 +132,7 @@ export function SyllabusUpload() {
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                             <Upload className="w-10 h-10 mb-3 text-muted-foreground" />
                             <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold text-primary">Click to upload</span> or drag and drop</p>
-                            <p className="text-xs text-muted-foreground">PDF, TXT, DOCX, etc. (MAX. 10MB)</p>
+                            <p className="text-xs text-muted-foreground">PDF or TXT (MAX. 25MB)</p>
                         </div>
                         <Input id="file-upload" type="file" className="hidden" onChange={handleFileChange} accept={ACCEPTED_FILE_TYPES.join(',')} />
                     </label>

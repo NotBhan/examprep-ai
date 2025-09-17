@@ -20,7 +20,7 @@ const DeconstructSyllabusInputSchema = z.object({
   syllabusDataUri: z
     .string()
     .describe(
-      "The syllabus file content as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'. Supported file types: PDF, TXT, DOCX, PPTX, XLSX."
+      "The syllabus file content as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'. Supported file types: PDF, TXT."
     ),
 });
 export type DeconstructSyllabusInput = z.infer<
