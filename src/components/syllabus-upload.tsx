@@ -65,7 +65,7 @@ export function SyllabusUpload() {
     const file = data.file;
 
     try {
-      const syllabusText = await file.text();
+      const syllabusFileText = await file.text();
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = async () => {
@@ -74,15 +74,13 @@ export function SyllabusUpload() {
           const result = await deconstructSyllabusAction(dataUri);
 
           if (result.success && result.data?.mindMap) {
-            addSyllabus({ mindMap: result.data.mindMap, syllabusText, fileName: file.name });
+            addSyllabus({ mindMap: result.data.mindMap, syllabusText: syllabusFileText, fileName: file.name });
             toast({
               title: 'Success!',
               description: 'Your syllabus has been deconstructed.',
             });
             router.push('/dashboard');
           } else {
-            // This was previously throwing an error and crashing the app.
-            // Now we let the catch block handle it.
             throw new Error(result.error || "An unknown error occurred during deconstruction.");
           }
         } catch (error: any) {
@@ -102,6 +100,7 @@ export function SyllabusUpload() {
               description: description,
             });
         } finally {
+            // We only stop loading on the final step.
             setIsSubmitting(false);
             setIsSyllabusLoading(false);
         }
@@ -114,7 +113,7 @@ export function SyllabusUpload() {
         toast({
             variant: 'destructive',
             title: 'Upload Failed',
-            description: 'Could not read the file. Please ensure it is a valid PDF or TXT file and try again.',
+            description: error.message || 'Could not read the file. Please ensure it is a valid PDF or TXT file and try again.',
         });
         setIsSubmitting(false);
         setIsSyllabusLoading(false);

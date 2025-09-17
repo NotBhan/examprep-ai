@@ -9,7 +9,7 @@ export interface Syllabus {
   id: string;
   name: string;
   mindMap: SyllabusMindMap;
-  syllabusText: string;
+  // syllabusText is no longer stored directly in the main object list
   createdAt: string;
 }
 
@@ -25,7 +25,7 @@ interface AppContextType {
   deleteSyllabus: (id: string) => void;
   updateSyllabusName: (id: string, newName: string) => void;
   
-  // Legacy accessors for components that haven't been migrated yet
+  // These provide data for the currently active syllabus
   mindMap: SyllabusMindMap | null;
   syllabusText: string | null;
   fileName: string | null;
@@ -40,6 +40,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<string | null>(null);
   const [syllabuses, setSyllabuses] = useState<Syllabus[]>([]);
   const [activeSyllabusId, setActiveSyllabusId] = useState<string | null>(null);
+  const [activeSyllabusText, setActiveSyllabusText] = useState<string | null>(null);
   const [isSyllabusLoading, setIsSyllabusLoading] = useState<boolean>(true);
   const router = useRouter();
 
@@ -51,21 +52,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
       
       const parsedSyllabuses: Syllabus[] = storedSyllabuses ? JSON.parse(storedSyllabuses) : [];
       setSyllabuses(parsedSyllabuses);
-
+      
+      let currentActiveId = null;
       if (storedActiveId && parsedSyllabuses.some(s => s.id === storedActiveId)) {
-        setActiveSyllabusId(storedActiveId);
+        currentActiveId = storedActiveId;
       } else if (parsedSyllabuses.length > 0) {
-        // Default to the most recently created one if active one is not found
         const sorted = [...parsedSyllabuses].sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        setActiveSyllabusId(sorted[0].id);
+        currentActiveId = sorted[0].id;
+      }
+      
+      if (currentActiveId) {
+        setActiveSyllabusId(currentActiveId);
+        const storedText = localStorage.getItem(`${username}_syllabus_text_${currentActiveId}`);
+        setActiveSyllabusText(storedText);
       } else {
         setActiveSyllabusId(null);
+        setActiveSyllabusText(null);
       }
 
     } catch (error) {
       console.error('Failed to parse syllabus data from localStorage', error);
       setSyllabuses([]);
       setActiveSyllabusId(null);
+      setActiveSyllabusText(null);
     } finally {
       setIsSyllabusLoading(false);
     }
@@ -93,14 +102,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setUser(null);
       setSyllabuses([]);
       setActiveSyllabusId(null);
+      setActiveSyllabusText(null);
     }
   };
 
-  const persistSyllabuses = (syllabuses: Syllabus[]) => {
+  const persistSyllabuses = (syllabusesToPersist: Syllabus[]) => {
     if (user) {
-      localStorage.setItem(`${user}_syllabuses`, JSON.stringify(syllabuses));
+      try {
+        localStorage.setItem(`${user}_syllabuses`, JSON.stringify(syllabusesToPersist));
+        setSyllabuses(syllabusesToPersist);
+      } catch (error) {
+        console.error("Failed to save syllabuses to localStorage", error);
+        // Potentially notify the user that the data couldn't be saved
+      }
     }
-    setSyllabuses(syllabuses);
   };
 
   const persistActiveSyllabusId = (id: string | null) => {
@@ -112,24 +127,46 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }
      }
      setActiveSyllabusId(id);
+     if (id && user) {
+        const storedText = localStorage.getItem(`${user}_syllabus_text_${id}`);
+        setActiveSyllabusText(storedText);
+     } else {
+        setActiveSyllabusText(null);
+     }
   }
 
   const addSyllabus = ({ mindMap, syllabusText, fileName }: { mindMap: SyllabusMindMap; syllabusText: string; fileName: string }) => {
+    if (!user) return;
     const newSyllabus: Syllabus = {
       id: `syllabus_${Date.now()}`,
       name: fileName,
       mindMap,
-      syllabusText,
       createdAt: new Date().toISOString(),
     };
-    const updatedSyllabuses = [...syllabuses, newSyllabus];
-    persistSyllabuses(updatedSyllabuses);
-    persistActiveSyllabusId(newSyllabus.id);
+    
+    try {
+      // Store the large text separately
+      localStorage.setItem(`${user}_syllabus_text_${newSyllabus.id}`, syllabusText);
+      
+      const updatedSyllabuses = [...syllabuses, newSyllabus];
+      persistSyllabuses(updatedSyllabuses);
+      persistActiveSyllabusId(newSyllabus.id);
+
+    } catch (error) {
+      console.error("Failed to save new syllabus, storage might be full.", error);
+      // Clean up the text if the syllabus list fails to update
+      localStorage.removeItem(`${user}_syllabus_text_${newSyllabus.id}`);
+      throw new Error("Could not save syllabus. Your browser storage is full.");
+    }
   };
 
   const deleteSyllabus = (id: string) => {
+    if (!user) return;
+    
     const updatedSyllabuses = syllabuses.filter(s => s.id !== id);
     persistSyllabuses(updatedSyllabuses);
+    localStorage.removeItem(`${user}_syllabus_text_${id}`);
+    
     if (activeSyllabusId === id) {
       const newActiveId = updatedSyllabuses.length > 0 ? updatedSyllabuses[0].id : null;
       persistActiveSyllabusId(newActiveId);
@@ -155,7 +192,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const activeSyllabus = syllabuses.find(s => s.id === activeSyllabusId) || null;
 
   const mindMap = activeSyllabus?.mindMap || null;
-  const syllabusText = activeSyllabus?.syllabusText || null;
+  const syllabusText = activeSyllabusText;
   const fileName = activeSyllabus?.name || null;
   
   return (
