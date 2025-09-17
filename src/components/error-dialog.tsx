@@ -20,13 +20,13 @@ export function ErrorDialog() {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{errorDialog.title}</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription className="break-words">
             {errorDialog.message}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogAction onClick={hideErrorDialog}>
-            OK
+            Close
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
