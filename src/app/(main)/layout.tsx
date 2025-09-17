@@ -153,19 +153,19 @@ export default function MainLayout({
                             <span>{syllabus.name}</span>
                         </SidebarMenuButton>
                         <SidebarMenuAction
-                          onClick={() => showRenameDialog(syllabus.id, syllabus.name)}
-                          tooltip="Rename"
-                          showOnHover
-                        >
-                          <Edit />
-                        </SidebarMenuAction>
-                        <SidebarMenuAction
                            onClick={() => showDeleteDialog(syllabus.id, syllabus.name)}
                            tooltip="Delete"
                            showOnHover
-                           className="right-8"
                         >
                             <Trash2 />
+                        </SidebarMenuAction>
+                        <SidebarMenuAction
+                          onClick={() => showRenameDialog(syllabus.id, syllabus.name)}
+                          tooltip="Rename"
+                          showOnHover
+                          className="right-8"
+                        >
+                          <Edit />
                         </SidebarMenuAction>
                      </SidebarMenuItem>
                   ))}
