@@ -13,6 +13,12 @@ export interface Syllabus {
   createdAt: string;
 }
 
+interface ErrorDialogState {
+  isOpen: boolean;
+  title: string;
+  message: string;
+}
+
 interface AppContextType {
   user: string | null;
   login: (username: string) => void;
@@ -32,6 +38,10 @@ interface AppContextType {
 
   isSyllabusLoading: boolean;
   setIsSyllabusLoading: (isLoading: boolean) => void;
+
+  errorDialog: ErrorDialogState;
+  showErrorDialog: (title: string, message: string) => void;
+  hideErrorDialog: () => void;
 }
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -42,6 +52,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [activeSyllabusId, setActiveSyllabusId] = useState<string | null>(null);
   const [activeSyllabusText, setActiveSyllabusText] = useState<string | null>(null);
   const [isSyllabusLoading, setIsSyllabusLoading] = useState<boolean>(true);
+  const [errorDialog, setErrorDialog] = useState<ErrorDialogState>({ isOpen: false, title: '', message: '' });
   const router = useRouter();
 
   const loadUserData = useCallback((username: string) => {
@@ -189,6 +200,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const showErrorDialog = (title: string, message: string) => {
+    setErrorDialog({ isOpen: true, title, message });
+  };
+
+  const hideErrorDialog = () => {
+    setErrorDialog({ isOpen: false, title: '', message: '' });
+  };
+
   const activeSyllabus = syllabuses.find(s => s.id === activeSyllabusId) || null;
 
   const mindMap = activeSyllabus?.mindMap || null;
@@ -210,7 +229,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       syllabusText,
       fileName,
       isSyllabusLoading, 
-      setIsSyllabusLoading 
+      setIsSyllabusLoading,
+      errorDialog,
+      showErrorDialog,
+      hideErrorDialog
     }}>
       {children}
     </AppContext.Provider>

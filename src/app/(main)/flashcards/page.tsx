@@ -21,7 +21,6 @@ import {
 import { Loader2, RotateCw, Lightbulb } from 'lucide-react';
 import { useAppContext } from '@/hooks/use-app';
 import { generateFlashcardsAction } from '../actions';
-import { useToast } from '@/hooks/use-toast';
 import type { SyllabusSubTopic, SyllabusTopic } from '@/lib/types';
 
 type Flashcard = {
@@ -30,8 +29,7 @@ type Flashcard = {
 };
 
 export default function FlashcardsPage() {
-  const { mindMap, syllabusText } = useAppContext();
-  const { toast } = useToast();
+  const { mindMap, syllabusText, showErrorDialog } = useAppContext();
   const [selectedTopic, setSelectedTopic] = useState<string>('');
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,11 +57,10 @@ export default function FlashcardsPage() {
 
   const handleGenerate = async () => {
     if (!selectedTopic || !syllabusText) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Please select a topic first.',
-      });
+      showErrorDialog(
+        'Error',
+        'Please select a topic first.'
+      );
       return;
     }
     setIsLoading(true);
@@ -76,11 +73,10 @@ export default function FlashcardsPage() {
         throw new Error(result.error || 'Failed to generate flashcards.');
       }
     } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Generation Failed',
-        description: error.message,
-      });
+      showErrorDialog(
+        'Generation Failed',
+        error.message
+      );
     } finally {
       setIsLoading(false);
     }
@@ -216,5 +212,3 @@ function FlashcardItem({ card }: { card: Flashcard }) {
       </div>
     );
 }
-
-    

@@ -32,6 +32,7 @@ import { useAppContext } from '@/hooks/use-app';
 import { useEffect, useState } from 'react';
 import { Header } from '@/components/header';
 import { Loader } from '@/components/loader';
+import { ErrorDialog } from '@/components/error-dialog';
 
 
 const navItems = [
@@ -162,6 +163,7 @@ export default function MainLayout({
           </div>
         </main>
       </div>
+      <ErrorDialog />
     </SidebarProvider>
   );
 }

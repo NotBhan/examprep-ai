@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Send, Bot, User, Lightbulb } from 'lucide-react';
 import { useAppContext } from '@/hooks/use-app';
-import { useToast } from '@/hooks/use-toast';
 import { askTutorAction } from '../actions';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -24,8 +23,7 @@ const examplePrompts = [
 ];
 
 export default function TutorPage() {
-    const { syllabusText } = useAppContext();
-    const { toast } = useToast();
+    const { syllabusText, showErrorDialog } = useAppContext();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -43,11 +41,10 @@ export default function TutorPage() {
 
     const handleSendMessage = async () => {
         if (input.trim() === '' || !syllabusText) {
-            toast({
-                variant: 'destructive',
-                title: 'Error',
-                description: !syllabusText ? 'No active syllabus found.' : 'Please enter a question.',
-            });
+            showErrorDialog(
+                'Error',
+                !syllabusText ? 'No active syllabus found. Please upload or select a syllabus first.' : 'Please enter a question.'
+            );
             return;
         }
 
@@ -65,11 +62,10 @@ export default function TutorPage() {
             }
         } catch (error: any) {
             setMessages(newMessages); // Revert to messages before AI call
-            toast({
-                variant: 'destructive',
-                title: 'Tutor Error',
-                description: error.message,
-            });
+            showErrorDialog(
+                'Tutor Error',
+                error.message
+            );
         } finally {
             setIsLoading(false);
         }

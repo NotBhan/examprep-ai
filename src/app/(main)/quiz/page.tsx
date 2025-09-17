@@ -40,7 +40,6 @@ import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
 import { useAppContext } from '@/hooks/use-app';
 import { generateQuizAction } from '../actions';
-import { useToast } from '@/hooks/use-toast';
 import type { SyllabusSubTopic, SyllabusTopic, GenerateQuizOutput } from '@/lib/types';
 import { CheckCircle, XCircle, Loader2, Lightbulb, FileQuestion, ArrowLeft, RotateCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -50,12 +49,11 @@ type QuizData = GenerateQuizOutput['quiz'];
 const quizFormSchema = z.object({
   topic: z.string().min(1, 'Please select a topic.'),
   difficulty: z.enum(['easy', 'medium', 'hard']),
-  numQuestions: z.number().min(1).max(20),
+  numQuestions: z.number().min(1).max(15),
 });
 
 export default function QuizPage() {
-  const { mindMap, syllabusText } = useAppContext();
-  const { toast } = useToast();
+  const { mindMap, syllabusText, showErrorDialog } = useAppContext();
 
   const [isLoading, setIsLoading] = useState(false);
   const [quizData, setQuizData] = useState<QuizData | null>(null);
@@ -95,7 +93,7 @@ export default function QuizPage() {
 
   const handleGenerateQuiz = async (values: z.infer<typeof quizFormSchema>) => {
     if (!syllabusText) {
-        toast({ variant: 'destructive', title: 'Error', description: 'No syllabus content found.' });
+        showErrorDialog('Error', 'No syllabus content found.');
         return;
     }
     setIsLoading(true);
@@ -111,11 +109,10 @@ export default function QuizPage() {
         throw new Error(result.error || 'Failed to generate quiz.');
       }
     } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Quiz Generation Failed',
-        description: error.message,
-      });
+      showErrorDialog(
+        'Quiz Generation Failed',
+        error.message
+      );
     } finally {
       setIsLoading(false);
     }

@@ -43,7 +43,7 @@ export function SyllabusUpload() {
   const [fileName, setFileName] = useState('');
   const router = useRouter();
   const { toast } = useToast();
-  const { addSyllabus, setIsSyllabusLoading } = useAppContext();
+  const { addSyllabus, setIsSyllabusLoading, showErrorDialog } = useAppContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -85,22 +85,22 @@ export function SyllabusUpload() {
           }
         } catch (error: any) {
             console.error(error);
+            let title = 'Analysis Failed';
             let description = 'Could not process the syllabus. Please try again.';
             if (error.message && error.message.includes('503 Service Unavailable')) {
+              title = 'AI Model Overloaded';
               description = 'The AI model is currently overloaded. Please try again in a few moments.';
             } else if (error.message && error.message.includes('invalid format')) {
+              title = 'Invalid AI Response';
               description = 'The AI returned an invalid format. Please try uploading the file again.';
             } else if (error.message.includes('quota')) {
-                description = 'Your browser storage is full. Please remove some syllabuses to add new ones.'
+              title = 'Storage Full';
+              description = 'Your browser storage is full. Please remove some syllabuses to add new ones.'
             } else if (error.message) {
               description = error.message;
             }
             
-            toast({
-              variant: 'destructive',
-              title: 'Analysis Failed',
-              description: description,
-            });
+            showErrorDialog(title, description);
         } finally {
             // We only stop loading on the final step.
             setIsSubmitting(false);
@@ -112,11 +112,10 @@ export function SyllabusUpload() {
       }
     } catch (error: any) {
         console.error(error);
-        toast({
-            variant: 'destructive',
-            title: 'Upload Failed',
-            description: error.message || 'Could not read the file. Please ensure it is a valid PDF or TXT file and try again.',
-        });
+        showErrorDialog(
+          'Upload Failed',
+          error.message || 'Could not read the file. Please ensure it is a valid PDF or TXT file and try again.'
+        );
         setIsSubmitting(false);
         setIsSyllabusLoading(false);
     }

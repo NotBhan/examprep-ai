@@ -31,7 +31,7 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const { login } = useAppContext();
+  const { login, showErrorDialog } = useAppContext();
   const heroImage = PlaceHolderImages.find((img) => img.id === 'hero-background');
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -53,11 +53,10 @@ export default function LoginPage() {
       });
       router.push('/upload');
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Login Failed',
-        description: 'An unexpected error occurred.',
-      });
+      showErrorDialog(
+        'Login Failed',
+        'An unexpected error occurred. Please try again.'
+      );
     } finally {
       setIsSubmitting(false);
     }

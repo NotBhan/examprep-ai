@@ -38,7 +38,6 @@ import { cn } from '@/lib/utils';
 import { Calendar as CalendarIcon, Loader2, BookOpen } from 'lucide-react';
 import { useAppContext } from '@/hooks/use-app';
 import { generateStudyPlanAction } from '../actions';
-import { useToast } from '@/hooks/use-toast';
 import ReactMarkdown from 'react-markdown';
 
 const formSchema = z.object({
@@ -55,8 +54,7 @@ const formSchema = z.object({
 });
 
 export default function StudyPlanPage() {
-  const { syllabusText } = useAppContext();
-  const { toast } = useToast();
+  const { syllabusText, showErrorDialog } = useAppContext();
   const [isLoading, setIsLoading] = useState(false);
   const [studyPlan, setStudyPlan] = useState<string | null>(null);
 
@@ -72,11 +70,10 @@ export default function StudyPlanPage() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (!syllabusText) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'No active syllabus found. Please upload a syllabus first.',
-      });
+      showErrorDialog(
+        'Error',
+        'No active syllabus found. Please upload a syllabus first.'
+      );
       return;
     }
     setIsLoading(true);
@@ -96,11 +93,10 @@ export default function StudyPlanPage() {
         throw new Error(result.error || 'Failed to generate study plan.');
       }
     } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Generation Failed',
-        description: error.message,
-      });
+      showErrorDialog(
+        'Generation Failed',
+        error.message
+      );
     } finally {
       setIsLoading(false);
     }
