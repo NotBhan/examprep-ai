@@ -29,7 +29,6 @@ export async function generateFlashcardsAction(
     }
 }
 
-// Placeholder actions for other features
 export async function generateStudyPlanAction(
   input: Parameters<typeof generateStudyPlan>[0]
 ) {
