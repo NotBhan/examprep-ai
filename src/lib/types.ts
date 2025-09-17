@@ -15,3 +15,20 @@ export type SyllabusTopic = {
 export type SyllabusMindMap = {
   topics: SyllabusTopic[];
 };
+
+// From on-demand-quiz-engine.ts
+export type GenerateQuizInput = {
+  topic: string;
+  difficulty: "easy" | "medium" | "hard";
+  numQuestions: number;
+};
+export type GenerateQuizOutput = {
+  quiz: {
+      question: string;
+      options: string[];
+      correctAnswer: string;
+      explanation: string;
+  }[];
+};
+
+    

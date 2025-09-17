@@ -216,3 +216,5 @@ function FlashcardItem({ card }: { card: Flashcard }) {
       </div>
     );
 }
+
+    
