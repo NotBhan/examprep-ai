@@ -12,7 +12,7 @@ const breadcrumbNameMap: { [key: string]: string } = {
   '/study-plan': 'Study Plan',
   '/quiz': 'Quiz',
   '/flashcards': 'Flashcards',
-  '/tutor': 'Tutor',
+  '/tutor': 'Marika (Tutor)',
   '/upload': 'Upload',
   '/history': 'Syllabus History',
 };

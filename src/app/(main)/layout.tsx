@@ -40,7 +40,7 @@ const navItems = [
   { href: '/study-plan', icon: CalendarDays, label: 'Study Plan' },
   { href: '/quiz', icon: FileQuestion, label: 'Quiz' },
   { href: '/flashcards', icon: NotebookText, label: 'Flashcards' },
-  { href: '/tutor', icon: Bot, label: 'Tutor' },
+  { href: '/tutor', icon: Bot, label: 'Marika (Tutor)' },
 ];
 
 export default function MainLayout({
