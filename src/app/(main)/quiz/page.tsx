@@ -126,7 +126,7 @@ export default function QuizPage() {
   };
   
   const handleNextQuestion = () => {
-      if (currentQuestionIndex < quizData!.length - 1) {
+      if (quizData && currentQuestionIndex < quizData.length - 1) {
           setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
           setQuizState('results');
@@ -283,7 +283,7 @@ export default function QuizPage() {
                     </CardContent>
                     <CardFooter>
                          <Button onClick={handleNextQuestion} disabled={!userAnswers[currentQuestionIndex]} className="w-full">
-                            {currentQuestionIndex < quizData.length - 1 ? 'Next Question' : 'Finish Quiz'}
+                            {quizData && currentQuestionIndex < quizData.length - 1 ? 'Next Question' : 'Finish Quiz'}
                          </Button>
                     </CardFooter>
                 </Card>
@@ -324,7 +324,7 @@ export default function QuizPage() {
                                 </AccordionTrigger>
                                 <AccordionContent className="p-4 border-t-0 border rounded-b-md">
                                     <div className="space-y-4">
-                                        <p><strong>Your answer:</strong> <span className={cn(isCorrect ? "text-green-600" : "text-red-600")}>{userAnswer}</span></p>
+                                        <p><strong>Your answer:</strong> <span className={cn(isCorrect ? "text-green-600" : "text-red-600")}>{userAnswer || "No answer"}</span></p>
                                         {!isCorrect && <p><strong>Correct answer:</strong> {q.correctAnswer}</p>}
                                         <div>
                                             <p className="font-semibold flex items-center gap-2"><Lightbulb className="h-4 w-4 text-primary"/> Explanation</p>
