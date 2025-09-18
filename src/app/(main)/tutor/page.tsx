@@ -23,7 +23,7 @@ const examplePrompts = [
 ];
 
 export default function TutorPage() {
-    const { syllabusText, showErrorDialog } = useAppContext();
+    const { mindMap, showErrorDialog } = useAppContext();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -40,10 +40,10 @@ export default function TutorPage() {
     }, [messages]);
 
     const handleSendMessage = async () => {
-        if (input.trim() === '' || !syllabusText) {
+        if (input.trim() === '' || !mindMap) {
             showErrorDialog(
                 'Error',
-                !syllabusText ? 'No active syllabus found. Please upload or select a syllabus first.' : 'Please enter a question.'
+                !mindMap ? 'No active syllabus found. Please upload or select a syllabus first.' : 'Please enter a question.'
             );
             return;
         }
@@ -54,7 +54,7 @@ export default function TutorPage() {
         setIsLoading(true);
 
         try {
-            const result = await askTutorAction({ question: input, syllabusContent: syllabusText });
+            const result = await askTutorAction({ question: input, mindMap: mindMap });
             if (result.success && result.data) {
                 setMessages([...newMessages, { role: 'assistant', content: result.data.answer }]);
             } else {
@@ -177,3 +177,4 @@ export default function TutorPage() {
         </div>
     );
 }
+

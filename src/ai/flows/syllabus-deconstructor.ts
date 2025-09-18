@@ -14,7 +14,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import type {SyllabusMindMap} from '@/lib/types';
 
 const DeconstructSyllabusInputSchema = z.object({
   syllabusDataUri: z
@@ -46,7 +45,7 @@ const SyllabusTopicSchema = z.object({
   subtopics: z.array(SyllabusSubTopicSchema).optional(),
 });
 
-const SyllabusMindMapSchema = z.object({
+export const SyllabusMindMapSchema = z.object({
   topics: z.array(SyllabusTopicSchema),
 });
 
