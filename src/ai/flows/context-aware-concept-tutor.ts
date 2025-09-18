@@ -10,7 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {SyllabusMindMapSchema} from './syllabus-deconstructor';
+import {SyllabusMindMapSchema} from './schemas';
 
 const AskQuestionInputSchema = z.object({
   mindMap: SyllabusMindMapSchema.describe(
