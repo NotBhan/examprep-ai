@@ -43,6 +43,7 @@ import { generateQuizAction } from '../actions';
 import type { SyllabusSubTopic, SyllabusTopic, GenerateQuizOutput } from '@/lib/types';
 import { CheckCircle, XCircle, Loader2, Lightbulb, FileQuestion, ArrowLeft, RotateCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 
 type QuizData = GenerateQuizOutput['quiz'];
 
@@ -271,14 +272,12 @@ export default function QuizPage() {
                     <CardContent>
                          <RadioGroup onValueChange={handleAnswerSelect} value={userAnswers[currentQuestionIndex]} className="space-y-4">
                             {quizData[currentQuestionIndex].options.map((option, index) => (
-                                <FormItem key={index} className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                        <RadioGroupItem value={option} id={`option-${index}`} />
-                                    </FormControl>
-                                    <FormLabel htmlFor={`option-${index}`} className="font-normal text-base w-full cursor-pointer p-3 border rounded-md hover:bg-accent/50 has-[[data-state=checked]]:bg-accent">
+                                <div key={index} className="flex items-center space-x-3 space-y-0">
+                                    <RadioGroupItem value={option} id={`option-${index}`} />
+                                    <Label htmlFor={`option-${index}`} className="font-normal text-base w-full cursor-pointer p-3 border rounded-md hover:bg-accent/50 has-[[data-state=checked]]:bg-accent">
                                         {option}
-                                    </FormLabel>
-                                </FormItem>
+                                    </Label>
+                                </div>
                             ))}
                          </RadioGroup>
                     </CardContent>
