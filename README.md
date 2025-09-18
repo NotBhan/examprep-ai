@@ -5,9 +5,13 @@ ExamPrep AI is an intelligent study assistant designed to help students supercha
 ## Features
 
 - **Syllabus Deconstructor**: Upload your syllabus (PDF or TXT) to instantly generate an interactive mind map. The AI analyzes the content to identify main topics, subtopics, and even estimates the importance (weightage) of each, giving you a clear overview of your course structure.
+
 - **Dynamic Study Planner**: Based on your deconstructed syllabus, generate a personalized study schedule. Customize it according to your exam date, available study hours, and preferred learning style.
+
 - **On-Demand Quiz Engine**: Test your knowledge by generating quizzes on any topic from your syllabus. You can specify the difficulty level and the number of questions.
+
 - **AI Flashcard Generator**: Create sets of flashcards for specific topics to reinforce key concepts, definitions, and formulas. It's a quick and effective way to memorize important information.
+
 - **Context-Aware Concept Tutor**: Have a question about a topic in your syllabus? Ask the AI tutor. It provides explanations, examples, and comparisons, all within the context of your course material.
 
 ## Tech Stack
