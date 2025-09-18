@@ -12,11 +12,17 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import {SyllabusMindMapSchema} from './schemas';
 
+const MessageSchema = z.object({
+    role: z.enum(['user', 'assistant']),
+    content: z.string(),
+});
+
 const AskQuestionInputSchema = z.object({
   mindMap: SyllabusMindMapSchema.describe(
     'The structured syllabus mind map, containing topics, subtopics, definitions, and weightages.'
   ),
-  question: z.string().describe('The question about the syllabus.'),
+  question: z.string().describe('The current question from the user.'),
+  history: z.array(MessageSchema).optional().describe('The previous conversation history.'),
 });
 export type AskQuestionInput = z.infer<typeof AskQuestionInputSchema>;
 
@@ -43,16 +49,28 @@ const prompt = ai.definePrompt({
 You can explain concepts, summarize topics, compare and contrast different sections, and answer specific questions. Your answers should be clear, concise, and directly derived from the 'Syllabus Mind Map'. Use formatting like lists or bold text to improve readability.
 
 1.  Thoroughly analyze the 'Syllabus Mind Map' to understand the context of the user's 'Question'. The mind map is a JSON object that contains all topics, subtopics, their definitions, and their importance (weightage).
-2.  Formulate a helpful and accurate answer based exclusively on the provided mind map structure and content.
-3.  If the syllabus genuinely does not contain information relevant to the question, and only in that case, you MUST respond with: "I could not find information about this topic in the provided syllabus." and set the 'fromSyllabus' flag to false.
-4.  For all other questions where the information is present, answer it to the best of your ability and set the 'fromSyllabus' flag to true. Do not use any external knowledge.
+2.  Consider the provided 'Conversation History' to understand the context of the current question.
+3.  Formulate a helpful and accurate answer based exclusively on the provided mind map structure and content.
+4.  If the syllabus genuinely does not contain information relevant to the question, and only in that case, you MUST respond with: "I could not find information about this topic in the provided syllabus." and set the 'fromSyllabus' flag to false.
+5.  For all other questions where the information is present, answer it to the best of your ability and set the 'fromSyllabus' flag to true. Do not use any external knowledge.
 
 Syllabus Mind Map (JSON format):
 {{{json mindMap}}}
 
 ---
 
-Question: {{{question}}}
+Conversation History:
+{{#if history}}
+{{#each history}}
+**{{role}}**: {{content}}
+{{/each}}
+{{else}}
+No previous conversation.
+{{/if}}
+
+---
+
+New Question: {{{question}}}
 `,
 });
 

@@ -1,4 +1,10 @@
 
+
+export type Message = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
 export type SyllabusSubTopic = string | {
   topic: string;
   definition?: string;
@@ -32,5 +38,3 @@ export type GenerateQuizOutput = {
       explanation: string;
   }[];
 };
-
-    

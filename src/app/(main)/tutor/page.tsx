@@ -9,11 +9,8 @@ import { Loader2, Send, Bot, User, Lightbulb } from 'lucide-react';
 import { useAppContext } from '@/hooks/use-app';
 import { askTutorAction } from '../actions';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import type { Message } from '@/lib/types';
 
-type Message = {
-    role: 'user' | 'assistant';
-    content: string;
-};
 
 const examplePrompts = [
     'Explain the most important topic.',
@@ -23,8 +20,7 @@ const examplePrompts = [
 ];
 
 export default function TutorPage() {
-    const { mindMap, showErrorDialog } = useAppContext();
-    const [messages, setMessages] = useState<Message[]>([]);
+    const { mindMap, showErrorDialog, chatHistory, setChatHistory, activeSyllabus } = useAppContext();
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -37,7 +33,7 @@ export default function TutorPage() {
                 behavior: 'smooth'
             });
         }
-    }, [messages]);
+    }, [chatHistory]);
 
     const handleSendMessage = async () => {
         if (input.trim() === '' || !mindMap) {
@@ -47,25 +43,35 @@ export default function TutorPage() {
             );
             return;
         }
+        
+        const currentSyllabusId = activeSyllabus?.id;
+        if (!currentSyllabusId) {
+            showErrorDialog('Error', 'No active syllabus selected.');
+            return;
+        }
 
-        const newMessages: Message[] = [...messages, { role: 'user', content: input }];
-        setMessages(newMessages);
+        const userMessage: Message = { role: 'user', content: input };
+        const newMessages: Message[] = [...(chatHistory[currentSyllabusId] || []), userMessage];
+        
+        setChatHistory(currentSyllabusId, newMessages);
         setInput('');
         setIsLoading(true);
 
         try {
-            const result = await askTutorAction({ question: input, mindMap: mindMap });
+            const result = await askTutorAction({ question: input, mindMap: mindMap, history: newMessages.slice(0, -1) });
             if (result.success && result.data) {
-                setMessages([...newMessages, { role: 'assistant', content: result.data.answer }]);
+                const assistantMessage: Message = { role: 'assistant', content: result.data.answer };
+                setChatHistory(currentSyllabusId, [...newMessages, assistantMessage]);
             } else {
                 throw new Error(result.error || 'Failed to get an answer.');
             }
         } catch (error: any) {
-            setMessages(newMessages); // Revert to messages before AI call
             showErrorDialog(
                 'Tutor Error',
                 error.message
             );
+            // On error, remove the user's message to prevent it from being saved without a response
+            setChatHistory(currentSyllabusId, newMessages.slice(0, -1));
         } finally {
             setIsLoading(false);
         }
@@ -75,6 +81,8 @@ export default function TutorPage() {
         setInput(prompt);
         inputRef.current?.focus();
     }
+    
+    const messages = activeSyllabus?.id ? chatHistory[activeSyllabus.id] || [] : [];
 
     return (
         <div className="flex flex-col h-[calc(100vh-8rem)]">
@@ -177,4 +185,3 @@ export default function TutorPage() {
         </div>
     );
 }
-

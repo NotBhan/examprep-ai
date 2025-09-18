@@ -2,7 +2,7 @@
 'use client';
 
 import { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import type { SyllabusMindMap } from '@/lib/types';
+import type { SyllabusMindMap, Message } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 
 export interface Syllabus {
@@ -29,6 +29,10 @@ interface DeleteDialogState {
     isOpen: boolean;
     syllabusId: string | null;
     syllabusName: string;
+}
+
+interface ChatHistory {
+  [syllabusId: string]: Message[];
 }
 
 interface AppContextType {
@@ -62,6 +66,9 @@ interface AppContextType {
   deleteDialog: DeleteDialogState;
   showDeleteDialog: (id: string, name: string) => void;
   hideDeleteDialog: () => void;
+
+  chatHistory: ChatHistory;
+  setChatHistory: (syllabusId: string, messages: Message[]) => void;
 }
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -75,6 +82,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [errorDialog, setErrorDialog] = useState<ErrorDialogState>({ isOpen: false, title: '', message: '' });
   const [renameDialog, setRenameDialog] = useState<RenameDialogState>({ isOpen: false, syllabusId: null, currentName: '' });
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({ isOpen: false, syllabusId: null, syllabusName: '' });
+  const [chatHistory, setChatHistoryState] = useState<ChatHistory>({});
   const router = useRouter();
 
   const loadUserData = useCallback((username: string) => {
@@ -82,9 +90,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const storedSyllabuses = localStorage.getItem(`${username}_syllabuses`);
       const storedActiveId = localStorage.getItem(`${username}_activeSyllabusId`);
+      const storedChatHistory = localStorage.getItem(`${username}_chat_history`);
       
       const parsedSyllabuses: Syllabus[] = storedSyllabuses ? JSON.parse(storedSyllabuses) : [];
       setSyllabuses(parsedSyllabuses);
+
+      const parsedChatHistory: ChatHistory = storedChatHistory ? JSON.parse(storedChatHistory) : {};
+      setChatHistoryState(parsedChatHistory);
       
       let currentActiveId = null;
       if (storedActiveId && parsedSyllabuses.some(s => s.id === storedActiveId)) {
@@ -104,10 +116,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
 
     } catch (error) {
-      console.error('Failed to parse syllabus data from localStorage', error);
+      console.error('Failed to parse data from localStorage', error);
       setSyllabuses([]);
       setActiveSyllabusId(null);
       setActiveSyllabusText(null);
+      setChatHistoryState({});
     } finally {
       setIsSyllabusLoading(false);
     }
@@ -136,6 +149,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setSyllabuses([]);
       setActiveSyllabusId(null);
       setActiveSyllabusText(null);
+      setChatHistoryState({});
     }
   };
 
@@ -167,6 +181,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setActiveSyllabusText(null);
      }
   }
+
+  const setChatHistory = (syllabusId: string, messages: Message[]) => {
+    if (user) {
+        const newHistory = { ...chatHistory, [syllabusId]: messages };
+        setChatHistoryState(newHistory);
+        localStorage.setItem(`${user}_chat_history`, JSON.stringify(newHistory));
+    }
+  };
 
   const addSyllabus = ({ mindMap, syllabusText, fileName }: { mindMap: SyllabusMindMap; syllabusText: string; fileName: string }) => {
     if (!user) return;
@@ -200,6 +222,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     persistSyllabuses(updatedSyllabuses);
     localStorage.removeItem(`${user}_syllabus_text_${id}`);
     
+    const newHistory = { ...chatHistory };
+    delete newHistory[id];
+    setChatHistoryState(newHistory);
+    localStorage.setItem(`${user}_chat_history`, JSON.stringify(newHistory));
+
     if (activeSyllabusId === id) {
       const newActiveId = updatedSyllabuses.length > 0 ? updatedSyllabuses[0].id : null;
       persistActiveSyllabusId(newActiveId);
@@ -276,7 +303,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       hideRenameDialog,
       deleteDialog,
       showDeleteDialog,
-      hideDeleteDialog
+      hideDeleteDialog,
+      chatHistory,
+      setChatHistory
     }}>
       {children}
     </AppContext.Provider>
